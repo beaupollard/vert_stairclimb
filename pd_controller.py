@@ -1,5 +1,6 @@
 import numpy as np
 import mj_utils
+import math
 
 class control():
     def __init__(self,sim,vel_des):
@@ -56,13 +57,14 @@ class control():
 
     def velowheel(self,input_v,lim):
 
+        ## Measure orientation ##
+        skiderror = 180/math.pi*math.asin(2*self.sim.data.get_body_xquat('frame')[3])
+        self.ke = 0.15*np.array([-skiderror,skiderror,-skiderror,skiderror])
+
         kp=10.#0.65*lim/input_v#10.
         ki=0.5
         for i in range(len(self.sim.model._actuator_id2name)):
-            if i>=2:
-                feedback=(11.*(self.sim.data.qvel[i+6]-input_v)+ki*self.integ[0][i])
-            else:
-                feedback=(kp*(self.sim.data.qvel[i+6]-input_v)+ki*self.integ[0][i])
+            feedback=self.ke[i]+(kp*(self.sim.data.qvel[i+6]-input_v)+ki*self.integ[0][i])
             self.integ[0][i]=feedback
             if abs(feedback)<lim:
                 self.sim.data.ctrl[i] = -feedback

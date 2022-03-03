@@ -1,14 +1,18 @@
 import numpy as np
 import math
 
-radius = 0.2286         # meters
-half_width = 0.0125     # meters
-tread_height = 0.009    # meters
-tread_width = 0.00525   # meters
+# radius = 0.2286         # meters
+# half_width = 0.0125     # meters
+# tread_height = 0.009    # meters
+# tread_width = 0.00525   # meters
+radius = 0.24765          # meters
+half_width = 0.0125       # meters
+tread_height = 0.03175    # meters
+tread_width = 0.0508      # meters
 names = ['lf_','rf_','lb_','rb_']
 wheel_pos = np.array([[0.5,-0.4,-0.1],[0.5,0.4,-0.1],[-0.5,-0.4,-0.1],[-0.5,0.4,-0.1]])
 mass = 1
-num_treads=24
+num_treads=16
 theta = np.linspace(0,(360-360/num_treads)*math.pi/180,num_treads)
 tabs="\t\t\t"
 string1 = ""

@@ -1,0 +1,283 @@
+
+<mujoco model="env">
+    <option timestep="0.0025" />
+    <actuator>
+        <motor gear="1.0" ctrllimited= "false" ctrlrange="-75.0 75.0" joint="wheel0" name="motor0"/>
+        <motor gear="1.0" ctrllimited= "false" ctrlrange="-75.0 75.0" joint="wheel1" name="motor1"/>
+        <motor gear="1.0" ctrllimited= "false" ctrlrange="-75.0 75.0" joint="wheel2" name="motor2"/>
+        <motor gear="1.0" ctrllimited= "false" ctrlrange="-75.0 75.0" joint="wheel3" name="motor3"/>
+    </actuator>
+    <sensor>
+        <torque name='torq0' site='wheel0_t'/>
+        <!-- <torque name='torq1' site='wheel1_t'/> -->
+        <!-- <torque name='UR5e_T_sen' site='arm:force_sensor'/> -->
+    </sensor>
+
+    <worldbody>
+        <body name="frame" pos="0.15 0 0.5">
+            <geom mass="50.0" pos="0.0 0.0 0.0" rgba="1 0 0 .25" size="0.42 0.3 0.1651" type="box"></geom>
+            <joint type='free' name='frame:base' pos='0 0 0'/>
+			<camera euler="0 0 0" fovy="40" name="rgb" pos="0 0 2.5"></camera>
+            <body name="mass0" pos="0.25 0.0000 -0.1" >
+                <geom mass="40." rgba="0 0 1 1" size="0.009 0.005 0.0125" type="box"/>
+            </body>            
+			<body name="rf_wheel" pos="0.305 -0.4 -0.19" quat="0.7071067811865476 0.7071067811865476 0 0"> 
+				<geom mass="1" rgba="0 0 1 1" size="0.24765 0.0125" type="cylinder"/>
+				<joint axis="0 0 1" name="wheel0" type="hinge"/>
+				<site name="wheel0_t" pos="0 0 0.0" size='0.00005 0.00005 0.00005' rgba='0 1 0 1' type='sphere'/>
+				<body name="lf_tread0" pos="0.2477 0.0000 0.0" quat="1.000000 0.0 0.0 0.000000">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread1" pos="0.2288 0.0948 0.0" quat="0.980785 0.0 0.0 0.195090">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread2" pos="0.1751 0.1751 0.0" quat="0.923880 0.0 0.0 0.382683">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread3" pos="0.0948 0.2288 0.0" quat="0.831470 0.0 0.0 0.555570">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread4" pos="-0.0000 0.2477 0.0" quat="0.707107 0.0 0.0 0.707107">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread5" pos="-0.0948 0.2288 0.0" quat="0.555570 0.0 0.0 0.831470">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread6" pos="-0.1751 0.1751 0.0" quat="0.382683 0.0 0.0 0.923880">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread7" pos="-0.2288 0.0948 0.0" quat="0.195090 0.0 0.0 0.980785">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread8" pos="-0.2477 -0.0000 0.0" quat="-0.000000 0.0 0.0 1.000000">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread9" pos="-0.2288 -0.0948 0.0" quat="-0.195090 0.0 0.0 0.980785">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread10" pos="-0.1751 -0.1751 0.0" quat="-0.382683 0.0 0.0 0.923880">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread11" pos="-0.0948 -0.2288 0.0" quat="-0.555570 0.0 0.0 0.831470">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread12" pos="0.0000 -0.2477 0.0" quat="-0.707107 0.0 0.0 0.707107">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread13" pos="0.0948 -0.2288 0.0" quat="-0.831470 0.0 0.0 0.555570">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread14" pos="0.1751 -0.1751 0.0" quat="-0.923880 0.0 0.0 0.382683">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lf_tread15" pos="0.2288 -0.0948 0.0" quat="-0.980785 0.0 0.0 0.195090">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+			</body>
+			<body name="lf_wheel" pos="0.305 0.4 -0.19" quat="0.7071067811865476 0.7071067811865476 0 0"> 
+				<geom mass="1" rgba="0 0 1 1" size="0.24765 0.0125" type="cylinder"/>
+				<joint axis="0 0 1" name="wheel1" type="hinge"/>
+				<site name="wheel1_t" pos="0 0 0.0" size='0.00005 0.00005 0.00005' rgba='0 1 0 1' type='sphere'/>
+				<body name="rf_tread0" pos="0.2477 0.0000 0.0" quat="1.000000 0.0 0.0 0.000000">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread1" pos="0.2288 0.0948 0.0" quat="0.980785 0.0 0.0 0.195090">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread2" pos="0.1751 0.1751 0.0" quat="0.923880 0.0 0.0 0.382683">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread3" pos="0.0948 0.2288 0.0" quat="0.831470 0.0 0.0 0.555570">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread4" pos="-0.0000 0.2477 0.0" quat="0.707107 0.0 0.0 0.707107">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread5" pos="-0.0948 0.2288 0.0" quat="0.555570 0.0 0.0 0.831470">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread6" pos="-0.1751 0.1751 0.0" quat="0.382683 0.0 0.0 0.923880">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread7" pos="-0.2288 0.0948 0.0" quat="0.195090 0.0 0.0 0.980785">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread8" pos="-0.2477 -0.0000 0.0" quat="-0.000000 0.0 0.0 1.000000">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread9" pos="-0.2288 -0.0948 0.0" quat="-0.195090 0.0 0.0 0.980785">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread10" pos="-0.1751 -0.1751 0.0" quat="-0.382683 0.0 0.0 0.923880">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread11" pos="-0.0948 -0.2288 0.0" quat="-0.555570 0.0 0.0 0.831470">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread12" pos="0.0000 -0.2477 0.0" quat="-0.707107 0.0 0.0 0.707107">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread13" pos="0.0948 -0.2288 0.0" quat="-0.831470 0.0 0.0 0.555570">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread14" pos="0.1751 -0.1751 0.0" quat="-0.923880 0.0 0.0 0.382683">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rf_tread15" pos="0.2288 -0.0948 0.0" quat="-0.980785 0.0 0.0 0.195090">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+			</body>
+			<body name="rb_wheel" pos="-0.305 -0.4 -0.19" quat="0.7071067811865476 0.7071067811865476 0 0"> 
+				<geom mass="1" rgba="0 0 1 1" size="0.24765 0.0125" type="cylinder"/>
+				<joint axis="0 0 1" name="wheel2" type="hinge"/>
+				<site name="wheel2_t" pos="0 0 0.0" size='0.00005 0.00005 0.00005' rgba='0 1 0 1' type='sphere'/>
+				<body name="lb_tread0" pos="0.2477 0.0000 0.0" quat="1.000000 0.0 0.0 0.000000">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread1" pos="0.2288 0.0948 0.0" quat="0.980785 0.0 0.0 0.195090">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread2" pos="0.1751 0.1751 0.0" quat="0.923880 0.0 0.0 0.382683">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread3" pos="0.0948 0.2288 0.0" quat="0.831470 0.0 0.0 0.555570">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread4" pos="-0.0000 0.2477 0.0" quat="0.707107 0.0 0.0 0.707107">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread5" pos="-0.0948 0.2288 0.0" quat="0.555570 0.0 0.0 0.831470">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread6" pos="-0.1751 0.1751 0.0" quat="0.382683 0.0 0.0 0.923880">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread7" pos="-0.2288 0.0948 0.0" quat="0.195090 0.0 0.0 0.980785">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread8" pos="-0.2477 -0.0000 0.0" quat="-0.000000 0.0 0.0 1.000000">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread9" pos="-0.2288 -0.0948 0.0" quat="-0.195090 0.0 0.0 0.980785">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread10" pos="-0.1751 -0.1751 0.0" quat="-0.382683 0.0 0.0 0.923880">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread11" pos="-0.0948 -0.2288 0.0" quat="-0.555570 0.0 0.0 0.831470">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread12" pos="0.0000 -0.2477 0.0" quat="-0.707107 0.0 0.0 0.707107">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread13" pos="0.0948 -0.2288 0.0" quat="-0.831470 0.0 0.0 0.555570">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread14" pos="0.1751 -0.1751 0.0" quat="-0.923880 0.0 0.0 0.382683">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="lb_tread15" pos="0.2288 -0.0948 0.0" quat="-0.980785 0.0 0.0 0.195090">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+			</body>
+			<body name="lb_wheel" pos="-0.305 0.4 -0.19" quat="0.7071067811865476 0.7071067811865476 0 0"> 
+				<geom mass="1" rgba="0 0 1 1" size="0.24765 0.0125" type="cylinder"/>
+				<joint axis="0 0 1" name="wheel3" type="hinge"/>
+				<site name="wheel3_t" pos="0 0 0.0" size='0.00005 0.00005 0.00005' rgba='0 1 0 1' type='sphere'/>
+				<body name="rb_tread0" pos="0.2477 0.0000 0.0" quat="1.000000 0.0 0.0 0.000000">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread1" pos="0.2288 0.0948 0.0" quat="0.980785 0.0 0.0 0.195090">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread2" pos="0.1751 0.1751 0.0" quat="0.923880 0.0 0.0 0.382683">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread3" pos="0.0948 0.2288 0.0" quat="0.831470 0.0 0.0 0.555570">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread4" pos="-0.0000 0.2477 0.0" quat="0.707107 0.0 0.0 0.707107">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread5" pos="-0.0948 0.2288 0.0" quat="0.555570 0.0 0.0 0.831470">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread6" pos="-0.1751 0.1751 0.0" quat="0.382683 0.0 0.0 0.923880">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread7" pos="-0.2288 0.0948 0.0" quat="0.195090 0.0 0.0 0.980785">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread8" pos="-0.2477 -0.0000 0.0" quat="-0.000000 0.0 0.0 1.000000">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread9" pos="-0.2288 -0.0948 0.0" quat="-0.195090 0.0 0.0 0.980785">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread10" pos="-0.1751 -0.1751 0.0" quat="-0.382683 0.0 0.0 0.923880">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread11" pos="-0.0948 -0.2288 0.0" quat="-0.555570 0.0 0.0 0.831470">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread12" pos="0.0000 -0.2477 0.0" quat="-0.707107 0.0 0.0 0.707107">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread13" pos="0.0948 -0.2288 0.0" quat="-0.831470 0.0 0.0 0.555570">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread14" pos="0.1751 -0.1751 0.0" quat="-0.923880 0.0 0.0 0.382683">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+				<body name="rb_tread15" pos="0.2288 -0.0948 0.0" quat="-0.980785 0.0 0.0 0.195090">
+					<geom mass="0.001" rgba="0 0 1 1" size="0.016 0.025 0.0125" type="box"/>
+				</body>
+			</body>
+
+
+
+
+
+        </body>
+
+        <body name="floor" pos="0 0 0.0">
+            <geom condim="6" size="20.0 20.0 0.02" rgba="0 1 0 1" type="box"/>
+            <body name="step0" pos="1.0 0 0.08636">
+                <geom condim="3" size="0.14605 1.61 0.08636" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step1" pos="1.2921 0.0 0.17272">
+                <geom condim="3" size="0.14605 1.61 0.17272" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step2" pos="1.5842 0.0 0.25908">
+                <geom condim="3" size="0.14605 1.61 0.25908" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step3" pos="1.8763 0.0 0.34544">
+                <geom condim="3" size="0.14605 1.61 0.34544" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step4" pos="2.1684 0.0 0.4318">
+                <geom condim="3" size="0.14605 1.61 0.4318" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step5" pos="2.4605 0.0 0.51816">
+                <geom condim="3" size="0.14605 1.61 0.51816" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step6" pos="2.7526 0.0 0.60452">
+                <geom condim="3" size="0.14605 1.61 0.60452" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step7" pos="3.0447 0.0 0.69088">
+                <geom condim="3" size="0.14605 1.61 0.69088" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step8" pos="3.3368 0.0 0.77724">
+                <geom condim="3" size="0.14605 1.61 0.77724" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step9" pos="3.6289 0.0 0.8636">
+                <geom condim="3" size="0.14605 1.61 0.8636" rgba="1 1 1 1" type="box"/>
+            </body>
+            <body name="step10" pos="5.921 0.0 0.94996">
+                <geom condim="3" size="2.14605 1.61 0.94996" rgba="1 1 1 1" type="box"/>
+                <site name='wypt0' pos="0 0 0.94996" size='0.0005 0.0005 0.0005' rgba='1 1 0 1' type='sphere'/>
+            </body>
+
+        </body>
+    </worldbody>
+
+</mujoco>
