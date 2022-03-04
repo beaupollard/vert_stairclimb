@@ -11,8 +11,8 @@ class control():
         self.xg0 = 0.0
         self.integ = np.zeros((1,len(self.sim.model._actuator_id2name)))
         self.integ_tot = np.zeros((1,len(self.sim.model._actuator_id2name)))
+        self.num_acts = len(self.sim.model._actuator_id2name)
         
-
     def pos_error(self):
         xd=mj_utils.get_site_state(self.sim, self.sim.model.site_name2id(self.wypt_name))
         xc=mj_utils.get_body_state(self.sim, self.sim.model.body_name2id(self.frame_name))
@@ -59,7 +59,7 @@ class control():
 
         ## Measure orientation ##
         skiderror = 180/math.pi*math.asin(2*self.sim.data.get_body_xquat('frame')[3])
-        self.ke = 0.15*np.array([-skiderror,skiderror,-skiderror,skiderror])
+        self.ke = 0.15*np.array([-skiderror,skiderror,-skiderror,skiderror,0])
 
         kp=10.#0.65*lim/input_v#10.
         ki=0.5
