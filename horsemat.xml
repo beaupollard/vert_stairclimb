@@ -1,5 +1,6 @@
 
 <mujoco model="env">
+	<size njmax="8000" nconmax="4000"/>
     <option timestep="0.0025" />
     <actuator>
         <motor gear="1.0" ctrllimited= "false" ctrlrange="-75.0 75.0" joint="wheel0" name="motor0"/>

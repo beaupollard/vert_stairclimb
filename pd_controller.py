@@ -12,6 +12,7 @@ class control():
         self.integ = np.zeros((1,len(self.sim.model._actuator_id2name)))
         self.integ_tot = np.zeros((1,len(self.sim.model._actuator_id2name)))
         self.num_acts = len(self.sim.model._actuator_id2name)
+        self.flag=False
         
     def pos_error(self):
         xd=mj_utils.get_site_state(self.sim, self.sim.model.site_name2id(self.wypt_name))
@@ -40,27 +41,34 @@ class control():
     def velo(self,input_v,lim):
 
         kp=0.5
-        ki=0.000001
+        ki=0.00001
         for i in range(len(self.sim.model._actuator_id2name)):
             if self.sim.model._actuator_id2name[i][-1]=='0':
-                feedback=(20*kp*(self.sim.data.qvel[i+6]-input_v)+10000.*ki*self.integ[0][i])
-                self.integ[0][i]=feedback
+                feedback=1.0*abs(lim/(input_v/2))*(self.sim.data.qvel[i+6]-input_v/2)#+ki*self.sim.data.qacc[i+6]#(10*kp*(self.sim.data.qvel[i+6]-input_v/2)+0.*ki*self.integ[0][i])
+                # print(self.sim.model._actuator_id2name[i], self.sim.data.qvel[i+6], feedback)
+                self.integ[0][i]=self.integ[0][i]+feedback
+                
                 
             else:
-                feedback=(kp*(self.sim.data.qvel[i+6]-input_v)+ki*self.integ[0][i])
+                feedback=(kp*(self.sim.data.qvel[i+6]-input_v)+0.*ki*self.integ[0][i])
                 self.integ[0][i]=feedback
             if abs(feedback)<lim:
                 self.sim.data.ctrl[i] = -feedback
             else:
-                self.sim.data.ctrl[i] = -lim
+                self.sim.data.ctrl[i] = -np.sign(feedback)*lim
         self.integ_tot=np.append(self.integ_tot,self.integ,axis=0)
 
     def velowheel(self,input_v,lim):
 
         ## Measure orientation ##
-        skiderror = 180/math.pi*math.asin(2*self.sim.data.get_body_xquat('frame')[3])
+        if abs(2*self.sim.data.get_body_xquat('frame')[3])<=1.:
+            skiderror = 180/math.pi*math.asin(2*self.sim.data.get_body_xquat('frame')[3])
+            self.flag=False
+        else:
+            skiderror = 180/math.pi
+            self.flag=True
+            
         self.ke = 0.15*np.array([-skiderror,skiderror,-skiderror,skiderror,0])
-
         kp=10.#0.65*lim/input_v#10.
         ki=0.5
         for i in range(len(self.sim.model._actuator_id2name)):
