@@ -19,7 +19,7 @@ while True:
         
         if success_flag==False and count==0:
             torque_lim=btorque_lim
-        if count>7:
+        if count>5:
             moveon=True
 
         if success_flag==True:

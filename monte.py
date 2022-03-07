@@ -55,7 +55,7 @@ def monte_sim_wheel():
 def monte_sim_planet():
 
     sim_dict = {
-        "wheelbase_mean" : 0.31,
+        "wheelbase_mean" : 0.35,
         "wheelbase_std" :  0.05,
         "payload_xloc_mean" : 0.0,
         "payload_xloc_std" :  0.15,

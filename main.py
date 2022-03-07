@@ -66,7 +66,7 @@ def main_run(viz,env_name,torque_lim,planet):
             contr_pow=np.append(contr_pow,np.reshape(abs(sim.data.actuator_force*sim.data.qvel[-pd.num_acts:]/(2*math.pi)*60./9.5488),(1,len(sim.model._actuator_id2name))),axis=0)
         
 
-        if sim.data.time>11+500*0.0025:
+        if sim.data.time>12+500*0.0025:
             return False, contr_max
         elif abs(180/math.pi*math.asin(sim.data.get_body_xquat('frame')[2]))>45.:
             return False, contr_max

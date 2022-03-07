@@ -39,12 +39,12 @@ class control():
                 self.sim.data.ctrl[i] = -input_t#-input_t
 
     def velo(self,input_v,lim):
-
+        kconst=1#(len(self.sim.model._actuator_id2name))/4-1
         kp=0.5
         ki=0.00001
         for i in range(len(self.sim.model._actuator_id2name)):
             if self.sim.model._actuator_id2name[i][-1]=='0':
-                feedback=1.0*abs(lim/(input_v/2))*(self.sim.data.qvel[i+6]-input_v/2)#+ki*self.sim.data.qacc[i+6]#(10*kp*(self.sim.data.qvel[i+6]-input_v/2)+0.*ki*self.integ[0][i])
+                feedback=1.0*abs(lim/(input_v/kconst))*(self.sim.data.qvel[i+6]-input_v/kconst)#+ki*self.sim.data.qacc[i+6]#(10*kp*(self.sim.data.qvel[i+6]-input_v/2)+0.*ki*self.integ[0][i])
                 # print(self.sim.model._actuator_id2name[i], self.sim.data.qvel[i+6], feedback)
                 self.integ[0][i]=self.integ[0][i]+feedback
                 
