@@ -3,7 +3,7 @@ import numpy as np
 import csv
 
 rows = []
-with open("data_plan.csv", 'r') as file:
+with open("data.csv", 'r') as file:
     csvreader = csv.reader(file)
     header = next(csvreader)
     for row in csvreader:
@@ -75,7 +75,8 @@ for i in rows:
 
         axs[0,0].plot(float(inp[2]),float(inp[3]),'ob')
         axs[1,0].plot(float(inp[3]),float(inp[4]),'ob')
-        axs[0,1].plot(float(inp[5]),inp[6],'ob')
+        # axs[0,1].plot(float(inp[5]),inp[10],'ob')
+        axs[0,1].plot(float(inp[10]),max(inp[11:]),col[int(inp[2]-3)])
         # axs[0,1].plot(float(inp[3]),float(inp[15]),'or')
         # for j in range(3):
         #     if inp[2]==j+3:
@@ -85,14 +86,14 @@ for i in rows:
     else:
         axs[0,0].plot(float(inp[2]),float(inp[3]),'or',alpha=0.5)
         axs[1,0].plot(float(inp[3]),float(inp[4]),'or',alpha=0.5)
-        axs[0,1].plot(float(inp[5]),inp[6],'or')
+        # axs[0,1].plot(float(inp[5]),inp[6],'or',alpha=0.35)
     
 axs[0,0].set_xlabel('Wheel radius [m]')
 axs[0,0].set_ylabel('Wheelbase [m]')
 axs[1,0].set_xlabel('Planet radius [m]')
 axs[1,0].set_ylabel('Wheelbase [m]')
-axs[0,1].set_xlabel('Payload xloc [m]')
-axs[0,1].set_ylabel('payload zloc [m]')
+axs[0,1].set_xlabel('Max power [W]')
+axs[0,1].set_ylabel('Max Torque [Nm]')
 axs[1,1].set_xlabel('Planet radius [m]')
 axs[1,1].set_ylabel('Torque [Nm]')
 

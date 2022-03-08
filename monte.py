@@ -2,25 +2,89 @@ import scipy
 import re
 import numpy as np
 from tire_generate_auto import planetary_gen, tire_gen
+from step_gen import gen_steps
+from utils_monte import get_gauss_rand
 
-def monte_sim_wheel():
+def monte_sim_wheel(sim_dict):
+    payload_weight = get_gauss_rand(sim_dict["payload_mean"],sim_dict["payload_std"],sim_dict["payload_llim"],sim_dict["payload_ulim"])
+    step_num=get_gauss_rand(sim_dict["step_num_mean"],sim_dict["step_num_std"],sim_dict["step_num_llim"],sim_dict["step_num_ulim"])
+    step_rise=get_gauss_rand(sim_dict["step_rise_mean"],sim_dict["step_rise_std"],sim_dict["step_rise_llim"],sim_dict["step_rise_ulim"])
+    step_slope=get_gauss_rand(sim_dict["step_slope_mean"],sim_dict["step_slope_std"],sim_dict["step_slope_llim"],sim_dict["step_slope_ulim"])
 
-    sim_dict = {
-        "wheelbase_mean" : 0.31,
-        "wheelbase_std" :  0.05,
-        "payload_xloc_mean" : 0.0,
-        "payload_xloc_std" :  0.15,
-        "payload_zloc_mean" : 0.0,
-        "payload_zloc_std" :  0.075,    
-        "wheel_size_mean" : 0.225,
-        "wheel_size_std" : 0.05,
-    }
+    payloadx=get_gauss_rand(sim_dict["payload_xloc_mean"],sim_dict["payload_xloc_std"],sim_dict["payload_xloc_llim"],sim_dict["payload_xloc_ulim"])
+    payloadz=get_gauss_rand(sim_dict["payload_zloc_mean"],sim_dict["payload_zloc_std"],sim_dict["payload_zloc_llim"],sim_dict["payload_zloc_ulim"])
+    count=1
+    wheelbase=0
+    radius=1
+    while wheelbase-radius<=0:
+        radius=get_gauss_rand(sim_dict["wheel_size_mean"],sim_dict["wheel_size_std"],sim_dict["wheel_size_llim"],sim_dict["wheel_size_ulim"])
+        wheelbase=get_gauss_rand(sim_dict["wheelbase_mean"],sim_dict["wheelbase_std"],sim_dict["wheelbase_llim"],sim_dict["wheelbase_ulim"])
+        count=count+1
+        if count>100:
+            print("Wheelbase error")
+            return
+
+    ## Change payload location ##
+    string1=tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight)
+    lines=string1
+
+    ## Change step Geom ##
+    string1 = gen_steps(step_num,step_rise,step_slope)
+    lines.append(string1)
 
 
-    file_name='horsemat.xml'
-    with open(file_name) as f:
-        lines = f.readlines()
+    file_name='envi.xml'
+    f=open(file_name,"w")
+    for i in lines:
+        f.writelines(i)
+    f.close()
 
+    return np.array([radius,wheelbase,payloadx,payloadz, step_rise, step_slope])
+
+def monte_sim_planet(sim_dict):
+    payload_weight = get_gauss_rand(sim_dict["payload_mean"],sim_dict["payload_std"],sim_dict["payload_llim"],sim_dict["payload_ulim"])
+    step_num=get_gauss_rand(sim_dict["step_num_mean"],sim_dict["step_num_std"],sim_dict["step_num_llim"],sim_dict["step_num_ulim"])
+    step_rise=get_gauss_rand(sim_dict["step_rise_mean"],sim_dict["step_rise_std"],sim_dict["step_rise_llim"],sim_dict["step_rise_ulim"])
+    step_slope=get_gauss_rand(sim_dict["step_slope_mean"],sim_dict["step_slope_std"],sim_dict["step_slope_llim"],sim_dict["step_slope_ulim"])
+
+    payloadx=get_gauss_rand(sim_dict["payload_xloc_mean"],sim_dict["payload_xloc_std"],sim_dict["payload_xloc_llim"],sim_dict["payload_xloc_ulim"])
+    payloadz=get_gauss_rand(sim_dict["payload_zloc_mean"],sim_dict["payload_zloc_std"],sim_dict["payload_zloc_llim"],sim_dict["payload_zloc_ulim"])
+    wheel_num=int(get_gauss_rand(sim_dict["wheel_num_mean"],sim_dict["wheel_num_std"],sim_dict["wheel_num_llim"],sim_dict["wheel_num_ulim"]))
+    count=1
+    wheelbase=0
+    sub_radius=0
+    radius=1
+    while wheelbase-(radius+sub_radius)<=0:
+        radius=get_gauss_rand(sim_dict["wheel_size_mean"],sim_dict["wheel_size_std"],sim_dict["wheel_size_llim"],sim_dict["wheel_size_ulim"])
+        wheelbase=get_gauss_rand(sim_dict["wheelbase_mean"],sim_dict["wheelbase_std"],sim_dict["wheelbase_llim"],sim_dict["wheelbase_ulim"])
+        sub_radius=get_gauss_rand(sim_dict["sub_wheel_size_mean"],sim_dict["sub_wheel_size_std"],sim_dict["sub_wheel_size_llim"],sim_dict["sub_wheel_size_ulim"])
+        count=count+1
+        if count>100:
+            print("Wheelbase error")
+            return
+
+    string1=planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight)
+
+    lines=string1
+
+    ## Change step Geom ##
+    string1 = gen_steps(step_num,step_rise,step_slope)
+    lines.append(string1)
+
+    file_name='envi.xml'
+    f=open(file_name,"w")
+    for i in lines:
+        f.writelines(i)
+    f.close()
+
+    return np.array([ sub_radius, wheel_num, radius, wheelbase, payloadx, payloadz, step_rise, step_slope])
+
+def ID_Stairs(lines):
+    for i, stg in enumerate(lines):
+        if re.search(r'floor', stg):
+            return i
+
+def Payload_loc(lines,payloadx,payloadz):
     count = 0
     for i, stg in enumerate(lines):
         if re.search(r'rf_wheel', stg):
@@ -31,78 +95,6 @@ def monte_sim_wheel():
                 stop_s = i
         elif re.search(r'name=\"mass0\"',stg):
             vals=re.findall(r"[-+]?(?:\d*\.\d+|\d+)",stg)
-            payloadx = -0.1
-            while payloadx <-0.05:
-                payloadx = np.random.normal(sim_dict["payload_xloc_mean"],sim_dict["payload_xloc_std"])
-            payloadz = 0.3
-            while abs(payloadz) >0.2:
-                payloadz = np.random.normal(sim_dict["payload_zloc_mean"],sim_dict["payload_zloc_std"])
 
             lines[i]=stg[:re.search(vals[1],stg).regs[0][0]]+str(payloadx)+" 0.00 "+str(payloadz)+stg[re.search(vals[3],stg).regs[0][1]:]
-
-
-    string1,radius,posx=tire_gen(sim_dict)
-    lines[start_s:stop_s+1]=string1
-
-    file_name='envi.xml'
-    f=open(file_name,"w")
-    for i in lines:
-        f.writelines(i)
-    f.close()
-
-    return np.array([radius,posx,payloadx,payloadz])
-
-def monte_sim_planet():
-
-    sim_dict = {
-        "wheelbase_mean" : 0.35,
-        "wheelbase_std" :  0.05,
-        "payload_xloc_mean" : 0.0,
-        "payload_xloc_std" :  0.15,
-        "payload_zloc_mean" : 0.0,
-        "payload_zloc_std" :  0.075,    
-        "wheel_size_mean" : 0.225,
-        "wheel_size_std" : 0.05,
-        "sub_wheel_size_mean" : 0.0762,
-        "sub_wheel_size_std" : 0.01,        
-    }
-
-    string1, sub_radius, wheel_num, radius, posx, payloadx, payloadz=planetary_gen(sim_dict)
-    file_name='horsemat.xml'
-    with open(file_name) as f:
-        lines = f.readlines()
-
-    count = 0
-    for i, stg in enumerate(lines):
-        if re.search(r'rf_wheel', stg):
-            start_s = i
-        elif re.search(r'^\t\t\t</body>', stg) and count<4:
-            count = count +1
-            if count == 4:
-                stop_s = i
-
-    lines[:stop_s+1]=string1
-
-    file_name='envi.xml'
-    f=open(file_name,"w")
-    for i in lines:
-        f.writelines(i)
-    f.close()
-
-    return np.array([ sub_radius, wheel_num, radius, posx, payloadx, payloadz])
-
-
-#     count = 0
-# stg0=stg[re.search(r'^\t*',stg).regs[0][0]:re.search(r'^\t*',stg).regs[0][1]]
-# lines[start_]
-        # print("hey")
-    # if re.search(r'_wheel', stg):
-    #     ind=re.search(r'pos\s*=\s*\"',stg)
-    #     if ind:
-    #         stg0=stg[:ind.regs[0][1]]
-    #         vals=re.findall(r"[-+]?(?:\d*\.\d+|\d+)",stg[ind.regs[0][1]:])
-    #         indf=[re.search(vals[0],stg).regs[0][0],re.search(vals[0],stg).regs[0][1]]
-            
-
-    #     else:
-    #         print("error")
+    return start_s, stop_s, lines
