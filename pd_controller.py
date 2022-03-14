@@ -58,7 +58,7 @@ class control():
                 self.sim.data.ctrl[i] = -np.sign(feedback)*lim
         self.integ_tot=np.append(self.integ_tot,self.integ,axis=0)
 
-    def velowheel(self,input_v,lim):
+    def velowheel(self,input_v,lim,kei):
 
         ## Measure orientation ##
         if abs(2*self.sim.data.get_body_xquat('frame')[3])<=1.:
@@ -68,7 +68,7 @@ class control():
             skiderror = 180/math.pi
             self.flag=True
             
-        self.ke = 0.15*np.array([-skiderror,skiderror,-skiderror,skiderror,0])
+        self.ke = kei*np.array([-skiderror,skiderror,-skiderror,skiderror,0])
         kp=10.#0.65*lim/input_v#10.
         ki=0.5
         for i in range(len(self.sim.model._actuator_id2name)):

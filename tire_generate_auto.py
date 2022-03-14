@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight):
+def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear):
 
     half_width = 0.0125         # meters
     tread_height = 0.03175/2    # meters
@@ -10,8 +10,8 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight):
 
     
     wheel_pos = np.array([[wheelbase,-0.4,-0.19],[wheelbase,0.4,-0.19],[-wheelbase,-0.4,-0.19],[-wheelbase,0.4,-0.19]])
-    mass = 1
-    num_treads=16
+    mass = 2
+    num_treads=12
     theta = np.linspace(0,(360-360/num_treads)*math.pi/180,num_treads)
     tabs="\t\t\t"
     ## Setup the initial mujoco lines ##
@@ -24,23 +24,30 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight):
     for i in range(4):
         string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+'\" name=\"motor'+str(i)+'\"/>\n')
 
-    ## Finish setting up Mujoco inputs ##
+    ## Finish setting up Mujoco inputs ##-0.15
     string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"-0.15 0 1.0\" quat=\"1.0 0.0 0 0\">\n')
-    string1.append(tabs+'<geom mass=\"50.0\" pos=\"0 0 0\" rgba=\"1 0 0 1\" size=\"0.5 0.3 0.1651\" type=\"box\"></geom>\n\t\t\t<joint type=\'free\' name=\'frame:base\' pos=\'0 0 0\'/>\n')
-    string1.append(tabs+'<body name=\"mass0\" pos=\"'+str(payloadx)+' 0.0000 '+ str(payloadz)+'\" >\n\t\t\t\t<geom mass=\"'+str(payload_weight)+'\" rgba=\"0 0 1 1\" size=\"0.009 0.005 0.0125\" type=\"box\"/>\n\t\t\t</body>\n')
+    string1.append(tabs+'<geom mass=\"0.005\" pos=\"0 0 0\" rgba=\"1 0 0 0.35\" size=\"0.5 0.3 0.1651\" type=\"box\"></geom>\n\t\t\t<joint type=\'free\' name=\'frame:base\' pos=\'0 0 0\'/>\n')
+    string1.append(tabs+'<body name=\"mass0\" pos=\"'+str(payloadx)+' 0.0000 '+ str(payloadz)+'\" >\n\t\t\t\t<geom mass=\"'+str(payload_weight)+'\" rgba=\"0 1 1 1\" size=\"0.025\" type=\"sphere\"/>\n\t\t\t</body>\n')
+    string1.append(tabs+'<site name="winch" pos="0.5 0 0.0" size="0.1 0.1 0.1" rgba="0 1 0 0" type="sphere"/>\n')
     string1.append(tabs+'<camera euler=\"0 0 0\" fovy=\"40\" name=\"rgb\" pos=\"0 0 2.5\"></camera>\n')
 
+    radius_in=radius
     ## Create the wheel ##
     for i,name in enumerate(names):
+        if i <2:
+            radius=radius_in*front2rear
+        else:
+            radius = radius_in
+
         string1.append(tabs+"<body name=\""+name+"wheel\" pos=\""+str(wheel_pos[i,0])+" "+str(wheel_pos[i,1])+" "+str(wheel_pos[i,2])+"\" quat=\"0.7071067811865476 0.7071067811865476 0 0\"> \n")
-        string1.append(tabs+"\t<geom mass=\""+str(mass)+"\" rgba=\"0 0 1 1\" size=\""+str(radius) +" " + str(half_width)+"\" type=\"cylinder\"/>\n")
+        string1.append(tabs+"\t<geom mass=\""+str(mass)+"\" rgba=\"0 0 1 0.25\" size=\""+str(radius) +" " + str(half_width)+"\" type=\"cylinder\"/>\n")
         string1.append(tabs+"\t<joint axis=\"0 0 1\" name=\"wheel"+str(i)+"\" type=\"hinge\"/>\n")
         string1.append(tabs+"\t<site name=\"wheel"+str(i)+"_t\" pos=\"0 0 0.0\" size='0.00005 0.00005 0.00005' rgba='0 1 0 1' type='sphere'/>\n")
         for j,ang in enumerate(theta):
             quat = ["{:.6f}".format(math.cos(ang/2)),"0.0","0.0","{:.6f}".format(math.sin(ang/2))]
 
             string1.append(tabs+"\t<body name=\""+name+"tread"+str(j)+"\" pos=\""+"{:.4f}".format(radius*math.cos(ang))+ " " + "{:.4f}".format(radius*math.sin(ang)) +" 0.0\" quat=\"" +quat[0]+" "+quat[1]+" "+quat[2]+" "+quat[3]+"\">\n")
-            string1.append(tabs+"\t\t<geom mass=\"0.001\" rgba=\"0 0 1 1\" size=\""+"{:.3f}".format(tread_height) +" "+ "{:.3f}".format(tread_width) + " " + "{:.4f}".format(half_width) +"\" type=\"box\"/>\n")
+            string1.append(tabs+"\t\t<geom mass=\"0.022\" rgba=\"0 0 1 0.25\" size=\""+"{:.3f}".format(tread_height) +" "+ "{:.3f}".format(tread_width) + " " + "{:.4f}".format(half_width) +"\" type=\"box\"/>\n")
             string1.append(tabs+"\t</body>\n")
         string1.append(tabs+"</body>\n")  
     string1.append("\t\t</body>\n")    
@@ -51,8 +58,8 @@ def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payloa
 
     names = ['rf_','lf_','rb_','lb_']
     half_width = 0.0125   
-    
-    wheel_pos = np.array([[wheelbase,-0.4,-0.19],[wheelbase,0.4,-0.19],[-wheelbase,-0.4,-0.19],[-wheelbase,0.4,-0.19]])
+    wheel_pos = np.array([[wheelbase,-0.4,-0.14],[wheelbase,0.4,-0.14],[-wheelbase,-0.4,-0.14],[-wheelbase,0.4,-0.14]])
+    # wheel_pos = np.array([[wheelbase,-0.4,-0.19],[wheelbase,0.4,-0.19],[-wheelbase,-0.4,-0.19],[-wheelbase,0.4,-0.19]])
     mass = 1
     theta = np.linspace(0,(360-360/wheel_num)*math.pi/180,wheel_num)
     tabs="\t\t\t"
@@ -70,7 +77,7 @@ def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payloa
     
     ## Finish setting up Mujoco inputs ##
     string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"-0.15 0 1.0\" quat=\"1.0 0.0 0 0\">\n')
-    string1.append(tabs+'<geom mass=\"50.0\" pos=\"0 0 0\" rgba=\"1 0 0 1\" size=\"0.5 0.3 0.1651\" type=\"box\"></geom>\n\t\t\t<joint type=\'free\' name=\'frame:base\' pos=\'0 0 0\'/>\n')
+    string1.append(tabs+'<geom mass=\"0.005\" pos=\"0 0 0\" rgba=\"1 0 0 1\" size=\"0.5 0.3 0.1651\" type=\"box\"></geom>\n\t\t\t<joint type=\'free\' name=\'frame:base\' pos=\'0 0 0\'/>\n')
     string1.append(tabs+'<body name=\"mass0\" pos=\"'+str(payloadx)+' 0.0000 '+ str(payloadz)+'\" >\n\t\t\t\t<geom mass=\"'+str(payload_weight)+'\" rgba=\"0 0 1 1\" size=\"0.009 0.005 0.0125\" type=\"box\"/>\n\t\t\t</body>\n')
     string1.append(tabs+'<camera euler=\"0 0 0\" fovy=\"40\" name=\"rgb\" pos=\"0 0 2.5\"></camera>\n')
     ## Create the wheel ##

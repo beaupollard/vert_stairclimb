@@ -1,4 +1,6 @@
 import numpy as np
+from os.path import exists  
+import csv
 
 def get_site_state(sim,site_id):
     '''
@@ -27,3 +29,32 @@ def get_body_state(sim, body_id):
     pos_vel = np.array(sim.data.body_xvelp[body_id])
     ori_vel = np.array(sim.data.body_xvelr[body_id])
     return (ori_mat, pos, ori_vel, pos_vel) 
+
+def replace_output(filename,outp):
+    inp2 = []
+    rowout = []
+    row2=[]
+    count=0
+    outp=outp.reshape((len(outp[0,:]),))
+    if exists(filename):
+        with open(filename, 'r') as file:
+            csvreader = csv.reader(file)
+            header = next(csvreader)
+            for row in csvreader:
+                row2.append(row)
+        # with open('test.csv','w') as csvfile:
+     
+        for i, row in enumerate(row2):
+            inp=(row[0][:].split(' '))
+            inp = np.array([float(x) for x in inp])
+            # print(i)
+            if i==0:
+                with open(filename,'w') as csvfile:
+                    np.savetxt(csvfile,inp.reshape((1,len(inp))),delimiter=' ',header='Success wheel_radius wheelbase payload_xloc payload_zloc time steps/min cg_xloc max_power W0_torque W1_torque W2_torque W3_torque')   
+            else:
+                if sum(inp[1:7]==outp[1:7])==6:
+                    with open(filename,'a') as csvfile:
+                        np.savetxt(csvfile,outp.reshape((1,len(outp))))
+                else:
+                    with open(filename,'a') as csvfile:
+                        np.savetxt(csvfile,inp.reshape((1,len(inp))))

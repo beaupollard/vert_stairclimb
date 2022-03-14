@@ -5,7 +5,7 @@ from tire_generate_auto import planetary_gen, tire_gen
 from step_gen import gen_steps
 from utils_monte import get_gauss_rand
 
-def monte_sim_wheel(sim_dict):
+def monte_sim_wheel(sim_dict,file_name):
     payload_weight = get_gauss_rand(sim_dict["payload_mean"],sim_dict["payload_std"],sim_dict["payload_llim"],sim_dict["payload_ulim"])
     step_num=get_gauss_rand(sim_dict["step_num_mean"],sim_dict["step_num_std"],sim_dict["step_num_llim"],sim_dict["step_num_ulim"])
     step_rise=get_gauss_rand(sim_dict["step_rise_mean"],sim_dict["step_rise_std"],sim_dict["step_rise_llim"],sim_dict["step_rise_ulim"])
@@ -25,7 +25,7 @@ def monte_sim_wheel(sim_dict):
             return
 
     ## Change payload location ##
-    string1=tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight)
+    string1=tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["front2rear_ratio"])
     lines=string1
 
     ## Change step Geom ##
@@ -33,15 +33,15 @@ def monte_sim_wheel(sim_dict):
     lines.append(string1)
 
 
-    file_name='envi.xml'
+    # file_name='envi.xml'
     f=open(file_name,"w")
     for i in lines:
         f.writelines(i)
     f.close()
 
-    return np.array([radius,wheelbase,payloadx,payloadz, step_rise, step_slope])
+    return np.array([radius,wheelbase,payloadx,payloadz, step_rise, step_slope,payload_weight])
 
-def monte_sim_planet(sim_dict):
+def monte_sim_planet(sim_dict,file_name):
     payload_weight = get_gauss_rand(sim_dict["payload_mean"],sim_dict["payload_std"],sim_dict["payload_llim"],sim_dict["payload_ulim"])
     step_num=get_gauss_rand(sim_dict["step_num_mean"],sim_dict["step_num_std"],sim_dict["step_num_llim"],sim_dict["step_num_ulim"])
     step_rise=get_gauss_rand(sim_dict["step_rise_mean"],sim_dict["step_rise_std"],sim_dict["step_rise_llim"],sim_dict["step_rise_ulim"])
@@ -63,21 +63,19 @@ def monte_sim_planet(sim_dict):
             print("Wheelbase error")
             return
 
-    string1=planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight)
-
-    lines=string1
+    lines=planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight)
 
     ## Change step Geom ##
     string1 = gen_steps(step_num,step_rise,step_slope)
     lines.append(string1)
 
-    file_name='envi.xml'
+    file_name=file_name
     f=open(file_name,"w")
     for i in lines:
         f.writelines(i)
     f.close()
 
-    return np.array([ sub_radius, wheel_num, radius, wheelbase, payloadx, payloadz, step_rise, step_slope])
+    return np.array([ sub_radius, wheel_num, radius, wheelbase, payloadx, payloadz, step_rise, step_slope,payload_weight])
 
 def ID_Stairs(lines):
     for i, stg in enumerate(lines):
