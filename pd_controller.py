@@ -70,14 +70,19 @@ class control():
             
         self.ke = kei*np.array([-skiderror,skiderror,-skiderror,skiderror,0])
         kp=10.#0.65*lim/input_v#10.
-        ki=0.5
+        ki=0.75
         for i in range(len(self.sim.model._actuator_id2name)):
-            feedback=self.ke[i]+(kp*(self.sim.data.qvel[i+6]-input_v)+ki*self.integ[0][i])
+            # jtn_index=self.sim.model.joint_name2id('wheel'+str(i))
+            jtn_index=self.sim.model.get_joint_qvel_addr('wheel'+str(i))
+            feedback=self.ke[i]+(kp*(self.sim.data.qvel[jtn_index]-input_v)+ki*self.integ[0][i])
             self.integ[0][i]=feedback
             if abs(feedback)<lim:
                 self.sim.data.ctrl[i] = -feedback
             else:
                 self.sim.data.ctrl[i] = -lim
+                # if i >1:
+                #     print("STOP")
+                #     wheel_in=[ind for ind in ]
         self.integ_tot=np.append(self.integ_tot,self.integ,axis=0)
 
 

@@ -1,7 +1,7 @@
 import scipy
 import re
 import numpy as np
-from tire_generate_auto import planetary_gen, tire_gen
+from tire_generate_auto import planetary_gen, tire_gen, tire_gen_hinge
 from step_gen import gen_steps
 from utils_monte import get_gauss_rand
 
@@ -25,7 +25,10 @@ def monte_sim_wheel(sim_dict,file_name):
             return
 
     ## Change payload location ##
-    string1=tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["front2rear_ratio"])
+    if sim_dict["hinge"] ==1:
+        string1=tire_gen_hinge(radius,wheelbase,payloadx,payloadz,payload_weight)
+    else:
+        string1=tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["front2rear_ratio"])
     lines=string1
 
     ## Change step Geom ##

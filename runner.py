@@ -11,13 +11,13 @@ sim_dict = {
 
     "payload_xloc_mean" : 0.3,
     "payload_xloc_std" :  0.0,
-    "payload_xloc_llim" :  -0.05,
-    "payload_xloc_ulim" :  0.35,
+    "payload_xloc_llim" :  -1.05,
+    "payload_xloc_ulim" :  1.35,
 
     "payload_zloc_mean" : -0.15,
     "payload_zloc_std" :  0.0, 
-    "payload_zloc_llim" :  -0.25,
-    "payload_zloc_ulim" :  0.15,  
+    "payload_zloc_llim" :  -1.25,
+    "payload_zloc_ulim" :  1.15,  
 
     "wheel_size_mean" : 0.3,
     "wheel_size_std" : 0.00,
@@ -39,7 +39,7 @@ sim_dict = {
     "step_num_llim" : 1,
     "step_num_ulim" : 1000,
 
-    "step_rise_mean" : 0.2286,#0.2413,#0.2032,#0.1778, #0.2286
+    "step_rise_mean" : 0.2032,#0.2413,#0.2032,#0.1778, #0.2286
     "step_rise_std" : 0.0,
     "step_rise_llim" : 0.1524,
     "step_rise_ulim" : 0.2413,
@@ -47,14 +47,16 @@ sim_dict = {
     "step_slope_mean" : 45,
     "step_slope_std" : 0,
     "step_slope_llim" : 28,
-    "step_slope_ulim" : 45,  
+    "step_slope_ulim" : 85,  
 
     "payload_mean" : 60,
     "payload_std" : 0,
     "payload_llim" : 0,
     "payload_ulim" : 455,    
 
-    "front2rear_ratio" : 1.0 
+    "front2rear_ratio" : 1.0 ,
+
+    "hinge" : 0
 }
 
 # rise_in=np.linspace(0.1651,0.2413,5)
@@ -62,21 +64,21 @@ sim_dict = {
 # weight_in=np.linspace(30,70,10)
 # payx_in=np.linspace(0.15,0.3,10)
 weight_in=np.linspace(0.1,-0.2,10)
-radius_in=np.linspace(0.05,0.3,10)
-sim_dict["wheel_size_mean"] = 0.2286#0.1778#0.265
+radius_in=np.linspace(0.05,0.3,10)#-0.225
+sim_dict["wheel_size_mean"] = 0.1778#0.265#0.1778#0.265
 planet=1
 count2=0
 winch=0
-outfilename='Planet/slope36_3W9/tpayxlocVzloc_pay0.csv'
-sim_dict["step_slope_mean"] = 36
+outfilename='Wheeled/slope42/v1payxlocVzloc_pay40.csv'
+sim_dict["step_slope_mean"] = 55
 sim_dict["payload_zloc_mean"] = 0
 writeout=0
 filename_env='envi.xml'
 for i in range(len(radius_in)):
-    sim_dict["payload_xloc_mean"] = radius_in[0]
+    sim_dict["payload_xloc_mean"] = radius_in[-1]+0.1
     for j in range(len(weight_in)):
-        sim_dict["payload_mean"] = 50
-        sim_dict["payload_zloc_mean"] = weight_in[4]
+        sim_dict["payload_mean"] = 110
+        sim_dict["payload_zloc_mean"] = weight_in[-1]
         if planet==0:
             inpts=monte_sim_wheel(sim_dict,filename_env)
         else:
@@ -85,14 +87,14 @@ for i in range(len(radius_in)):
 
         count = 0
         moveon=False
-        utorque_lim=100.
+        utorque_lim=160.
         btorque_lim=40.
         torque_lim=utorque_lim
         env_name=filename_env
         count = 0
         contr_max_out=np.zeros((1,1))
         while moveon==False:
-            success_flag, contr_max = main_run(viz=True,env_name=env_name,torque_lim=torque_lim,planet=planet,winch=winch,kei=1.3)
+            success_flag, contr_max = main_run(viz=True,env_name=env_name,torque_lim=torque_lim,planet=planet,winch=winch,kei=0.95)
             
             if success_flag==False and count==0:#contr_max_out[0]==0:
                 torque_lim=btorque_lim
@@ -128,7 +130,7 @@ for i in range(len(radius_in)):
                 with open(outfilename,'a') as csvfile:
                     np.savetxt(csvfile,outp)
         else:
-            replace_output(outfilename,outp)
+            # replace_output(outfilename,outp)
             exit()
 
                

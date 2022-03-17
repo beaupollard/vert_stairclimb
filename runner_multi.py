@@ -12,13 +12,13 @@ sim_dict = {
 
     "payload_xloc_mean" : 0.3,
     "payload_xloc_std" :  0.0,
-    "payload_xloc_llim" :  -0.05,
-    "payload_xloc_ulim" :  0.35,
+    "payload_xloc_llim" :  -1.05,
+    "payload_xloc_ulim" :  1.35,
 
     "payload_zloc_mean" : -0.15,
     "payload_zloc_std" :  0.0, 
-    "payload_zloc_llim" :  -0.25,
-    "payload_zloc_ulim" :  0.15,  
+    "payload_zloc_llim" :  -1.25,
+    "payload_zloc_ulim" :  1.15,  
 
     "wheel_size_mean" : 0.3,
     "wheel_size_std" : 0.00,
@@ -55,20 +55,22 @@ sim_dict = {
     "payload_llim" : 0,
     "payload_ulim" : 455,    
 
-    "front2rear_ratio" : 1.0 
+    "front2rear_ratio" : 1.0 ,
+
+    "hinge" : 0
 }
 
 def run_multi(ii):
-    path = 'Planet/slope36_3W9/t'
+    path = 'Wheeled/slope42/v1'
     filenamelist=['payxlocVzloc_pay0.csv','payxlocVzloc_pay20.csv','payxlocVzloc_pay40.csv','payxlocVzloc_pay60.csv']
     vmass=[50,70,90,110]
-    sim_dict["step_slope_mean"] = 36
+    sim_dict["step_slope_mean"] = 42
     sim_dict["payload_zloc_mean"] = 0
     writeout=1
     weight_in=np.linspace(0.1,-0.2,10)
-    radius_in=np.linspace(0.05,0.3,10)
-    sim_dict["wheel_size_mean"] = 0.2286#0.1778#0.265
-    planet=1
+    radius_in=np.linspace(0.05,0.3,10)#-0.225
+    sim_dict["wheel_size_mean"] = 0.265#0.2286#0.1778#0.265
+    planet=0
     count2=0
     winch=0    
     outfilename=path+filenamelist[ii]
@@ -86,13 +88,13 @@ def run_multi(ii):
 
             count = 0
             moveon=False
-            utorque_lim=150.
+            utorque_lim=200.
             btorque_lim=40.
             torque_lim=utorque_lim
             env_name=filename_env[ii]#'envi.xml'
             count = 0
             contr_max_out=np.zeros((1,1))
-            kei=1.3
+            kei=1.2
             while moveon==False:
                 success_flag, contr_max = main_run(viz=False,env_name=env_name,torque_lim=torque_lim,planet=planet,winch=winch,kei=kei)
                 
@@ -101,7 +103,7 @@ def run_multi(ii):
                     if planet==1:
                         torque_lim=btorque_lim
                     else:
-                        kei=1.
+                        kei=0.9
                 if count>6:
                     moveon=True
 

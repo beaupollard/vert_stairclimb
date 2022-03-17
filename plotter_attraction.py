@@ -4,7 +4,7 @@ import csv
 from os.path import exists    
 from matplotlib import cm
 
-def Get_Basin(filename,parm1,parm2,parm3,ax):
+def Get_Basin(filename,parm1,parm2,parm3,ax,off_x):
     rows=[]
     inp2=[]
     if filename[-5]=='P':
@@ -38,11 +38,11 @@ def Get_Basin(filename,parm1,parm2,parm3,ax):
         print(np.amax(np.array(inp2)))
         for i in range(len(inp2)):
             if inp2[i][-1]==0:
-                ax.plot(inp2[i][0],inp2[i][1],'or',ms=12)
+                ax.plot(inp2[i][0]-off_x,inp2[i][1],'or',ms=12)
             else:
-                ax.plot(inp2[i][0],inp2[i][1],'ob',ms=12)
+                ax.plot(inp2[i][0]-off_x,inp2[i][1],'ob',ms=12)
 
-def Get_Surf(filename,parm1,parm2,parm3,ax,lx,lz):
+def Get_Surf(filename,parm1,parm2,parm3,ax,lx,lz,off_x):
     rows=[]
     inp2=[]
     if filename[-5]=='P':
@@ -68,9 +68,9 @@ def Get_Surf(filename,parm1,parm2,parm3,ax,lx,lz):
                 inp=(row[0][:].split(' '))
                 inp = ([float(x) for x in inp])
                 if inp[0]==1:
-                    inp2.append([inp[xin],inp[yin],max(inp[zin:])])
+                    inp2.append([inp[xin]-off_x,inp[yin],max(inp[zin:])])
                 else:
-                    inp2.append([inp[xin],inp[yin],0])
+                    inp2.append([inp[xin]-off_x,inp[yin],0])
                 
                 rows.append(row)
 
@@ -108,37 +108,38 @@ def Get_Surf(filename,parm1,parm2,parm3,ax,lx,lz):
 
 fig = plt.figure(figsize=plt.figaspect(0.5))
 
-path='Planet/slope36_3W9/t'
+path='Wheeled/slope42/v1'
 # path='Planet/slope36_5W/'
 titles=['0kg Payload','20kg Payload','40kg Payload','60kg Payload']
 # names=[path+'Wheel_payxlocVzloc_pay0.csv',path+'Wheel_payxlocVzloc_pay20.csv','test.csv',path+'Wheel_payxlocVzloc_pay60.csv']
 # names=[path+'Wheel_payxlocVzloc_pay0.csv',path+'Wheel_payxlocVzloc_pay20.csv',path+'Wheel_payxlocVzloc_pay40.csv',path+'Wheel_payxlocVzloc_pay60.csv']
 names=[path+'payxlocVzloc_pay0.csv',path+'payxlocVzloc_pay20.csv',path+'payxlocVzloc_pay40.csv',path+'payxlocVzloc_pay60.csv']
 fs=21
-for i in range(4):
-    ax = fig.add_subplot(2, 2, i+1)
-    # Get_Basin(names[i],3,4,12,ax) # for wheeled
-    Get_Basin(names[i],5,6,14,ax)   # for planet
-
-
-    ax.set_xlabel('Payload Xloc [m]',fontsize=fs)
-    ax.set_ylabel('Payload Zloc [m]',fontsize=fs)
-    ax.set_title(titles[i],fontsize=fs)
-    for label in (ax.get_xticklabels() + ax.get_yticklabels()):
-	    label.set_fontsize(fs)
-
 # for i in range(4):
-#     ax = fig.add_subplot(2, 2, i+1, projection='3d')
-#     # Get_Surf(names[i],3,4,12,ax,0.17,-0.09)#0.13 0 # for wheeled
-#     Get_Surf(names[i],5,6,14,ax,0.0,-0.01)#0.13 0 # for planet
+    # ax = fig.add_subplot(2, 2, i+1)
+    # Get_Basin(names[i],3,4,12,ax,off_x=0.0) # for wheeled hinge
+    # # Get_Basin(names[i],3,4,12,ax,off_x=-0.225) # for wheeled hinge
+    # # Get_Basin(names[i],5,6,14,ax,off_x=0.0)   # for planet
 
 
-#     ax.set_xlabel('Payload Xloc [m]',fontsize=fs,labelpad=30)
-#     ax.set_ylabel('Payload Zloc [m]',fontsize=fs,labelpad=30)
-#     ax.set_zlabel('Max Torque [Nm]',fontsize=fs,labelpad=20)
-#     ax.set_title(titles[i],fontsize=fs)
-#     for label in (ax.get_xticklabels() + ax.get_yticklabels() + ax.get_zticklabels()):
-# 	    label.set_fontsize(fs)
+    # ax.set_xlabel('Payload Xloc [m]',fontsize=fs)
+    # ax.set_ylabel('Payload Zloc [m]',fontsize=fs)
+    # ax.set_title(titles[i],fontsize=fs)
+    # for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+	#     label.set_fontsize(fs)
+
+for i in range(4):
+    ax = fig.add_subplot(2, 2, i+1, projection='3d')
+    Get_Surf(names[i],3,4,12,ax,-1.17,-0.01,off_x=-0.225)#0.13 0 # for wheeled
+    # Get_Surf(names[i],5,6,14,ax,0.0,-0.01,off_x=0.0)#0.13 0 # for planet
+
+
+    ax.set_xlabel('Payload Xloc [m]',fontsize=fs,labelpad=30)
+    ax.set_ylabel('Payload Zloc [m]',fontsize=fs,labelpad=30)
+    ax.set_zlabel('Max Torque [Nm]',fontsize=fs,labelpad=20)
+    ax.set_title(titles[i],fontsize=fs)
+    for label in (ax.get_xticklabels() + ax.get_yticklabels() + ax.get_zticklabels()):
+	    label.set_fontsize(fs)
 
 fig.tight_layout()
 plt.show()

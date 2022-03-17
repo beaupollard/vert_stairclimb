@@ -47,6 +47,8 @@ def replace_output(filename,outp):
         for i, row in enumerate(row2):
             inp=(row[0][:].split(' '))
             inp = np.array([float(x) for x in inp])
+            # if i>len(row2)-6:
+            #     print("Hey")
             # print(i)
             if i==0:
                 with open(filename,'w') as csvfile:

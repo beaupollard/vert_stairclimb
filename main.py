@@ -58,7 +58,7 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei):
             if planet==1:
                 pd.velo(-6.28,lim)
             else:
-                pd.velowheel(-6.28,lim,kei)
+                pd.velowheel(-4.28,lim,kei)
                 if winch==1:
                     apply_force(sim)
         
@@ -79,8 +79,8 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei):
               
         # # torque.append(180/math.pi*math.asin(sim.data.get_body_xquat('frame')[3]))
         # wheelspeed.append(sim.data.body_xpos[3])
-        # # wheelspeed0.append(sim.data.actuator_force[1])
-
+        # wheelspeed.append(sim.data.actuator_force[-1])
+        # torque.append(sim.data.qpos[sim.model.get_joint_qpos_addr('body_connect')]*180/math.pi)
         
         # torque.append(sim.data.xfrc_applied[1,0])        
         # wheelspeed.append(sim.data.get_site_xpos('winch')[0]/np.linalg.norm(np.array(sim.data.get_site_xpos('winch'))))        
