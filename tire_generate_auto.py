@@ -11,7 +11,7 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear):
     
     wheel_pos = np.array([[wheelbase,-0.4,-0.19],[wheelbase,0.4,-0.19],[-wheelbase,-0.4,-0.19],[-wheelbase,0.4,-0.19]])
     mass = 2
-    num_treads=12
+    num_treads=16
     theta = np.linspace(0,(360-360/num_treads)*math.pi/180,num_treads)
     tabs="\t\t\t"
     ## Setup the initial mujoco lines ##
@@ -29,7 +29,7 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear):
     string1.append(tabs+'<geom mass=\"0.005\" pos=\"0 0 0\" rgba=\"1 0 0 0.35\" size=\"0.5 0.3 0.1651\" type=\"box\"></geom>\n\t\t\t<joint type=\'free\' name=\'frame:base\' pos=\'0 0 0\'/>\n')
     string1.append(tabs+'<body name=\"mass0\" pos=\"'+str(payloadx)+' 0.0000 '+ str(payloadz)+'\" >\n\t\t\t\t<geom mass=\"'+str(payload_weight)+'\" rgba=\"0 1 1 1\" size=\"0.025\" type=\"sphere\"/>\n\t\t\t</body>\n')
     string1.append(tabs+'<site name="winch" pos="0.5 0 0.0" size="0.1 0.1 0.1" rgba="0 1 0 0" type="sphere"/>\n')
-    string1.append(tabs+'<camera euler=\"0 0 0\" fovy=\"40\" name=\"rgb\" pos=\"0 0 2.5\"></camera>\n')
+    # string1.append(tabs+'<camera euler=\"0 0 0\" fovy=\"40\" name=\"rgb\" pos=\"0 0 2.5\"></camera>\n')
 
     radius_in=radius
     ## Create the wheel ##
@@ -58,7 +58,7 @@ def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payloa
 
     names = ['rf_','lf_','rb_','lb_']
     half_width = 0.0125   
-    wheel_pos = np.array([[wheelbase,-0.4,-0.14],[wheelbase,0.4,-0.14],[-wheelbase,-0.4,-0.14],[-wheelbase,0.4,-0.14]])
+    wheel_pos = np.array([[wheelbase,-0.4,-0.19],[wheelbase,0.4,-0.19],[-wheelbase,-0.4,-0.19],[-wheelbase,0.4,-0.19]])
     # wheel_pos = np.array([[wheelbase,-0.4,-0.19],[wheelbase,0.4,-0.19],[-wheelbase,-0.4,-0.19],[-wheelbase,0.4,-0.19]])
     mass = 1
     theta = np.linspace(0,(360-360/wheel_num)*math.pi/180,wheel_num)
@@ -79,6 +79,7 @@ def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payloa
     string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"-0.15 0 1.0\" quat=\"1.0 0.0 0 0\">\n')
     string1.append(tabs+'<geom mass=\"0.005\" pos=\"0 0 0\" rgba=\"1 0 0 1\" size=\"0.5 0.3 0.1651\" type=\"box\"></geom>\n\t\t\t<joint type=\'free\' name=\'frame:base\' pos=\'0 0 0\'/>\n')
     string1.append(tabs+'<body name=\"mass0\" pos=\"'+str(payloadx)+' 0.0000 '+ str(payloadz)+'\" >\n\t\t\t\t<geom mass=\"'+str(payload_weight)+'\" rgba=\"0 0 1 1\" size=\"0.009 0.005 0.0125\" type=\"box\"/>\n\t\t\t</body>\n')
+    string1.append(tabs+'<site name="winch" pos="0.5 0 0.0" size="0.1 0.1 0.1" rgba="0 1 0 0" type="sphere"/>\n')
     string1.append(tabs+'<camera euler=\"0 0 0\" fovy=\"40\" name=\"rgb\" pos=\"0 0 2.5\"></camera>\n')
     ## Create the wheel ##
     for i,name in enumerate(names):

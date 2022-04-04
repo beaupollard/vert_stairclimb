@@ -50,7 +50,7 @@ class control():
                 
                 
             else:
-                feedback=(kp*(self.sim.data.qvel[i+6]-input_v)+0.*ki*self.integ[0][i])
+                feedback=0*(kp*(self.sim.data.qvel[i+6]-input_v)+0.*ki*self.integ[0][i])
                 self.integ[0][i]=feedback
             if abs(feedback)<lim:
                 self.sim.data.ctrl[i] = -feedback

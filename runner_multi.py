@@ -40,12 +40,12 @@ sim_dict = {
     "step_num_llim" : 1,
     "step_num_ulim" : 1000,
 
-    "step_rise_mean" : 0.2032,#0.2413,#0.2032,#0.1778, #0.2286
+    "step_rise_mean" : 0.174,#0.2032,#0.2413,#0.2032,#0.1778, #0.2286
     "step_rise_std" : 0.0,
     "step_rise_llim" : 0.1524,
     "step_rise_ulim" : 0.2413,
 
-    "step_slope_mean" : 45,
+    "step_slope_mean" : 31,
     "step_slope_std" : 0,
     "step_slope_llim" : 28,
     "step_slope_ulim" : 45,  
@@ -61,15 +61,15 @@ sim_dict = {
 }
 
 def run_multi(ii):
-    path = 'Wheeled/slope42/v1'
+    path = 'Wheeled/slope31/26v1'
     filenamelist=['payxlocVzloc_pay0.csv','payxlocVzloc_pay20.csv','payxlocVzloc_pay40.csv','payxlocVzloc_pay60.csv']
     vmass=[50,70,90,110]
-    sim_dict["step_slope_mean"] = 42
+    sim_dict["step_slope_mean"] = 31
     sim_dict["payload_zloc_mean"] = 0
     writeout=1
     weight_in=np.linspace(0.1,-0.2,10)
     radius_in=np.linspace(0.05,0.3,10)#-0.225
-    sim_dict["wheel_size_mean"] = 0.265#0.2286#0.1778#0.265
+    sim_dict["wheel_size_mean"] = 0.3302#0.3048#0.267#0.2286#0.1778#0.265
     planet=0
     count2=0
     winch=0    
@@ -88,7 +88,7 @@ def run_multi(ii):
 
             count = 0
             moveon=False
-            utorque_lim=200.
+            utorque_lim=150.
             btorque_lim=40.
             torque_lim=utorque_lim
             env_name=filename_env[ii]#'envi.xml'

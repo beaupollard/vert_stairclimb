@@ -39,7 +39,7 @@ sim_dict = {
     "step_num_llim" : 1,
     "step_num_ulim" : 1000,
 
-    "step_rise_mean" : 0.2032,#0.2413,#0.2032,#0.1778, #0.2286
+    "step_rise_mean" : 0.1778,#0.174,#0.2032,#0.2413,#0.2032,#0.1778, #0.2286
     "step_rise_std" : 0.0,
     "step_rise_llim" : 0.1524,
     "step_rise_ulim" : 0.2413,
@@ -65,20 +65,20 @@ sim_dict = {
 # payx_in=np.linspace(0.15,0.3,10)
 weight_in=np.linspace(0.1,-0.2,10)
 radius_in=np.linspace(0.05,0.3,10)#-0.225
-sim_dict["wheel_size_mean"] = 0.1778#0.265#0.1778#0.265
-planet=1
+sim_dict["wheel_size_mean"] = 0.265#0.1778#0.265
+planet=0
 count2=0
 winch=0
 outfilename='Wheeled/slope42/v1payxlocVzloc_pay40.csv'
-sim_dict["step_slope_mean"] = 55
-sim_dict["payload_zloc_mean"] = 0
+sim_dict["step_slope_mean"] = 36.0
+sim_dict["payload_zloc_mean"] = -0.2
 writeout=0
 filename_env='envi.xml'
 for i in range(len(radius_in)):
-    sim_dict["payload_xloc_mean"] = radius_in[-1]+0.1
+    sim_dict["payload_xloc_mean"] = radius_in[0]
     for j in range(len(weight_in)):
-        sim_dict["payload_mean"] = 110
-        sim_dict["payload_zloc_mean"] = weight_in[-1]
+        sim_dict["payload_mean"] = 60
+        sim_dict["payload_zloc_mean"] = weight_in[-2]
         if planet==0:
             inpts=monte_sim_wheel(sim_dict,filename_env)
         else:
@@ -87,8 +87,8 @@ for i in range(len(radius_in)):
 
         count = 0
         moveon=False
-        utorque_lim=160.
-        btorque_lim=40.
+        utorque_lim=100.
+        btorque_lim=0.
         torque_lim=utorque_lim
         env_name=filename_env
         count = 0

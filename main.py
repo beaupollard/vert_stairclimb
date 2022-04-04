@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from pd_controller import control
+from mujoco_py.generated import const
 
 fig = plt.figure(figsize=(12,6), facecolor='#DEDEDE')
 ax = plt.subplot(121)
@@ -26,7 +27,7 @@ def apply_force(sim):
     jacr=np.array(sim.data.get_site_jacr('winch').reshape((3, -1))[:,0:6])
     jacf=np.vstack([jacp,jacr])
     vec=np.vstack([np.array(sim.data.get_site_xpos('wypt0')-sim.data.get_site_xpos('winch')).reshape(3,1),np.zeros((3,1))])
-    vec = 70.*vec/np.linalg.norm(vec)
+    vec = 100.*vec/np.linalg.norm(vec)
     Fout = jacf.transpose()@vec
     for i,F in enumerate(Fout):
         sim.data.xfrc_applied[1,i] = F
@@ -39,6 +40,8 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei):
     pd = control(sim,0.4)
     if viz==True:
         viewer = MjViewer(sim)
+        viewer.cam.type = const.CAMERA_FIXED
+        viewer.cam.fixedcamid = 0        
         
 
     t = 0
@@ -54,11 +57,13 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei):
     run=True
     while run==True:
 
-        if t>500: 
+        if t>200: 
             if planet==1:
                 pd.velo(-6.28,lim)
+                if winch==1:
+                    apply_force(sim)                
             else:
-                pd.velowheel(-4.28,lim,kei)
+                pd.velowheel(-6.28,lim,kei)
                 if winch==1:
                     apply_force(sim)
         
@@ -79,6 +84,7 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei):
               
         # # torque.append(180/math.pi*math.asin(sim.data.get_body_xquat('frame')[3]))
         # wheelspeed.append(sim.data.body_xpos[3])
+        # torque.append(sim.data.actuator_force[0])
         # wheelspeed.append(sim.data.actuator_force[-1])
         # torque.append(sim.data.qpos[sim.model.get_joint_qpos_addr('body_connect')]*180/math.pi)
         

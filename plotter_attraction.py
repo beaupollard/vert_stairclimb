@@ -108,7 +108,7 @@ def Get_Surf(filename,parm1,parm2,parm3,ax,lx,lz,off_x):
 
 fig = plt.figure(figsize=plt.figaspect(0.5))
 
-path='Wheeled/slope42/v1'
+path='Wheeled/slope31/24'
 # path='Planet/slope36_5W/'
 titles=['0kg Payload','20kg Payload','40kg Payload','60kg Payload']
 # names=[path+'Wheel_payxlocVzloc_pay0.csv',path+'Wheel_payxlocVzloc_pay20.csv','test.csv',path+'Wheel_payxlocVzloc_pay60.csv']
@@ -116,21 +116,22 @@ titles=['0kg Payload','20kg Payload','40kg Payload','60kg Payload']
 names=[path+'payxlocVzloc_pay0.csv',path+'payxlocVzloc_pay20.csv',path+'payxlocVzloc_pay40.csv',path+'payxlocVzloc_pay60.csv']
 fs=21
 # for i in range(4):
-    # ax = fig.add_subplot(2, 2, i+1)
-    # Get_Basin(names[i],3,4,12,ax,off_x=0.0) # for wheeled hinge
-    # # Get_Basin(names[i],3,4,12,ax,off_x=-0.225) # for wheeled hinge
-    # # Get_Basin(names[i],5,6,14,ax,off_x=0.0)   # for planet
+#     ax = fig.add_subplot(2, 2, i+1)
+#     Get_Basin(names[i],3,4,12,ax,off_x=0.0) # for wheeled hinge
+#     # Get_Basin(names[i],3,4,12,ax,off_x=-0.225) # for wheeled hinge
+#     # Get_Basin(names[i],5,6,14,ax,off_x=0.0)   # for planet
 
 
-    # ax.set_xlabel('Payload Xloc [m]',fontsize=fs)
-    # ax.set_ylabel('Payload Zloc [m]',fontsize=fs)
-    # ax.set_title(titles[i],fontsize=fs)
-    # for label in (ax.get_xticklabels() + ax.get_yticklabels()):
-	#     label.set_fontsize(fs)
+#     ax.set_xlabel('Payload Xloc [m]',fontsize=fs)
+#     ax.set_ylabel('Payload Zloc [m]',fontsize=fs)
+#     ax.set_title(titles[i],fontsize=fs)
+#     for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+# 	    label.set_fontsize(fs)
 
 for i in range(4):
     ax = fig.add_subplot(2, 2, i+1, projection='3d')
-    Get_Surf(names[i],3,4,12,ax,-1.17,-0.01,off_x=-0.225)#0.13 0 # for wheeled
+    Get_Surf(names[i],3,4,12,ax,-1.17,-0.01,off_x=-0.)#0.13 0 # for wheeled
+    # Get_Surf(names[i],3,4,12,ax,-1.17,-0.01,off_x=-0.225)#0.13 0 # for wheeled
     # Get_Surf(names[i],5,6,14,ax,0.0,-0.01,off_x=0.0)#0.13 0 # for planet
 
 
