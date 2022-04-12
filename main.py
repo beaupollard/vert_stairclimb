@@ -27,12 +27,12 @@ def apply_force(sim):
     jacr=np.array(sim.data.get_site_jacr('winch').reshape((3, -1))[:,0:6])
     jacf=np.vstack([jacp,jacr])
     vec=np.vstack([np.array(sim.data.get_site_xpos('wypt0')-sim.data.get_site_xpos('winch')).reshape(3,1),np.zeros((3,1))])
-    vec = 100.*vec/np.linalg.norm(vec)
+    vec = 60.*vec/np.linalg.norm(vec)
     Fout = jacf.transpose()@vec
     for i,F in enumerate(Fout):
         sim.data.xfrc_applied[1,i] = F
 
-def main_run(viz,env_name,torque_lim,planet,winch,kei):
+def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
     _xml_path = env_name
     model  = load_model_from_path(_xml_path)
     sim = MjSim(model)
@@ -59,9 +59,13 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei):
 
         if t>200: 
             if planet==1:
-                pd.velo(-6.28,lim)
+                pd.velo(-6.28/1.5,lim)
                 if winch==1:
                     apply_force(sim)                
+            elif track==1:
+                pd.velotrack(-36.28,lim,kei)
+                if winch==1:
+                    apply_force(sim)
             else:
                 pd.velowheel(-6.28,lim,kei)
                 if winch==1:
@@ -72,6 +76,8 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei):
         #     sim.data.ctrl[0]=0
         #     sim.data.ctrl[6]=0
         t += 1
+        # if t>360:
+        #     print(t)
         sim.step()
         # print(sim.data.time)
         # torque.append(sim.data.body_xpos[3][0])
@@ -84,7 +90,7 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei):
               
         # # torque.append(180/math.pi*math.asin(sim.data.get_body_xquat('frame')[3]))
         # wheelspeed.append(sim.data.body_xpos[3])
-        # torque.append(sim.data.actuator_force[0])
+        torque.append(sim.data.actuator_force[0])
         # wheelspeed.append(sim.data.actuator_force[-1])
         # torque.append(sim.data.qpos[sim.model.get_joint_qpos_addr('body_connect')]*180/math.pi)
         
