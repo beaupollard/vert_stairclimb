@@ -1,6 +1,7 @@
 import numpy as np
 from os.path import exists  
 import csv
+import math
 
 def get_site_state(sim,site_id):
     '''
@@ -60,3 +61,12 @@ def replace_output(filename,outp):
                 else:
                     with open(filename,'a') as csvfile:
                         np.savetxt(csvfile,inp.reshape((1,len(inp))))
+
+def get_power(sim):
+    power=[]
+    for i in ((sim.model._actuator_id2name)):
+        jtn_index=sim.model.get_joint_qvel_addr(sim.model._actuator_id2name[i])
+        qvel=sim.data.qvel[jtn_index]
+        act_f=sim.data.actuator_force[i]
+        power.append(act_f*qvel/(2*math.pi)*60./9.5488)
+    return power

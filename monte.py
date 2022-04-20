@@ -68,10 +68,10 @@ def monte_sim_planet(sim_dict,file_name):
             print("Wheelbase error")
             return
 
-    lines=planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight)
+    lines=planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["fix_plans"],sim_dict["friction"])
 
     ## Change step Geom ##
-    string1 = gen_steps(step_num,step_rise,step_slope)
+    string1 = gen_steps(step_num,step_rise,step_slope,sim_dict["friction"])
     lines.append(string1)
 
     file_name=file_name

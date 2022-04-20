@@ -45,7 +45,8 @@ class control():
         ki=0.00001
         for i in range(len(self.sim.model._actuator_id2name)):
             if self.sim.model._actuator_id2name[i][-1]=='0':
-                feedback=1.0*abs(lim/(input_v/kconst))*(self.sim.data.qvel[i+6]-input_v/kconst)#+ki*self.sim.data.qacc[i+6]#(10*kp*(self.sim.data.qvel[i+6]-input_v/2)+0.*ki*self.integ[0][i])
+                jtn_index=self.sim.model.get_joint_qvel_addr(self.sim.model._actuator_id2name[i])
+                feedback=1.0*abs(lim/(input_v/kconst))*(self.sim.data.qvel[jtn_index]-input_v/kconst)#+ki*self.sim.data.qacc[i+6]#(10*kp*(self.sim.data.qvel[i+6]-input_v/2)+0.*ki*self.integ[0][i])
                 # print(self.sim.model._actuator_id2name[i], self.sim.data.qvel[i+6], feedback)
                 self.integ[0][i]=self.integ[0][i]+feedback
                 
@@ -71,7 +72,7 @@ class control():
             
         self.ke = kei*np.array([-skiderror,skiderror,-skiderror,skiderror,0])
         kp=10.#0.65*lim/input_v#10.
-        ki=0.75
+        ki=0.0075
         for i in range(len(self.sim.model._actuator_id2name)):
             jtn_index=self.sim.model.get_joint_qvel_addr('wheel'+str(i))
             feedback=self.ke[i]+(kp*(self.sim.data.qvel[jtn_index]-input_v)+ki*self.integ[0][i])

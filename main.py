@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from pd_controller import control
 from mujoco_py.generated import const
+from mj_utils import get_power
 
 fig = plt.figure(figsize=(12,6), facecolor='#DEDEDE')
 ax = plt.subplot(121)
@@ -45,9 +46,10 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
         
 
     t = 0
+    init_time=300
     contr_tot=np.zeros((1,len(sim.model._actuator_id2name)))
     contr_pow=np.zeros((1,len(sim.model._actuator_id2name)))
-    contr_max=np.zeros((1,len(sim.model._actuator_id2name)+4))
+    contr_max=np.zeros((1,len(sim.model._actuator_id2name)+6))
     
     torque=[]
     wheelspeed=[]
@@ -57,7 +59,7 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
     run=True
     while run==True:
 
-        if t>200: 
+        if t>init_time: 
             if planet==1:
                 pd.velo(-6.28/1.5,lim)
                 if winch==1:
@@ -71,10 +73,7 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
                 if winch==1:
                     apply_force(sim)
         
-        # print(max(torque))
-        # if sim.data.qpos[0]>=1.5:
-        #     sim.data.ctrl[0]=0
-        #     sim.data.ctrl[6]=0
+
         t += 1
         # if t>360:
         #     print(t)
@@ -101,20 +100,29 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
             # plotters(torque,wheelspeed)
             
         if sim.data.qpos[0]>=sim.data.get_site_xpos('wypt0')[0]-1.0:
-            contr_max[0,0]=sim.data.time-500*sim.model.opt.timestep
-            contr_max[0,1]=10/(sim.data.time-500*sim.model.opt.timestep)*60
+            contr_max[0,0]=sim.data.time-init_time*sim.model.opt.timestep
+            contr_max[0,1]=10/(sim.data.time-init_time*sim.model.opt.timestep)*60
             contr_max[0,2]=sim.data.qM[0]
-            contr_max[0,3]=max([np.amax((contr_pow[:,0])),np.amax((contr_pow[:,1])),np.amax((contr_pow[:,2])),np.amax((contr_pow[:,3]))])
+            pow_max=[]
+            pow_ave=[]
+            pow_sum=0
+            for k in range(len(contr_pow[0,:])):
+                pow_max.append(np.amax((contr_pow[:,k])))
+                pow_ave.append(sum(contr_pow[:,k])/np.shape(contr_pow)[0])
+                pow_sum=pow_sum+(sum(contr_pow[:,k]))
+            contr_max[0,3]=max(pow_max)
+            contr_max[0,4]=max(pow_ave)
+            contr_max[0,5]=pow_sum#max(pow_sum)
             for i in range(len(sim.model._actuator_id2name)):
-                contr_max[0,i+4]=np.amax(np.abs(contr_tot[:,i]))
+                contr_max[0,i+6]=np.amax(np.abs(contr_tot[:,i]))
             return True, contr_max
             run=False
         else:
             contr_tot=np.append(contr_tot,np.reshape(sim.data.actuator_force,(1,len(sim.model._actuator_id2name))),axis=0)
-            contr_pow=np.append(contr_pow,np.reshape(abs(sim.data.actuator_force*sim.data.qvel[-pd.num_acts:]/(2*math.pi)*60./9.5488),(1,len(sim.model._actuator_id2name))),axis=0)
+            contr_pow=np.append(contr_pow,np.array([get_power(sim)]),axis=0)
         
 
-        if sim.data.time>25+500*0.0025:
+        if sim.data.time>25+init_time*0.0025:
             return False, contr_max
         elif abs(180/math.pi*math.asin(sim.data.get_body_xquat('frame')[2]))>45.:
             return False, contr_max

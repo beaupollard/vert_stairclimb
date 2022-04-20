@@ -32,7 +32,7 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear):
     
     ## Specify the motor names and numbers ##
     for i in range(4):
-        string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+'\" name=\"motor'+str(i)+'\"/>\n')
+        string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+'\" name=\"wheel'+str(i)+'\"/>\n')
 
     ## Finish setting up Mujoco inputs ##-0.15
     string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"0.0 0 0.0\" quat=\"1.0 0.0 0 0\">\n')
@@ -64,7 +64,7 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear):
 
     return string1
 
-def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight):
+def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight,fix_plan,friction):
 
     names = ['rf_','lf_','rb_','lb_']
     half_width = 0.0125   
@@ -82,9 +82,12 @@ def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payloa
     
     ## Specify the motor names and numbers ##
     for i in range(4):
-        for j in range(wheel_num+1):
-            string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+str(j)+'\" name=\"motor'+str(i)+str(j)+'\"/>\n')
-    
+        if fix_plan==0:
+            for j in range(wheel_num+1):
+                string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+str(j)+'\" name=\"wheel'+str(i)+str(j)+'\"/>\n')
+        else:
+            string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+str(0)+'\" name=\"wheel'+str(i)+str(0)+'\"/>\n')
+
     ## Finish setting up Mujoco inputs ##
     string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"-0.15 0 1.0\" quat=\"1.0 0.0 0 0\">\n')
     string1.append(tabs+'<geom mass=\"0.005\" pos=\"0 0 0\" rgba=\"1 0 0 1\" size=\"0.5 0.3 0.1651\" type=\"box\"></geom>\n\t\t\t<joint type=\'free\' name=\'frame:base\' pos=\'0 0 0\'/>\n')
@@ -104,7 +107,8 @@ def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payloa
 
             string1.append(tabs+"\t<body name=\""+name+"subwheel"+str(j)+"\" pos=\""+"{:.4f}".format(radius*math.cos(ang))+ " " + "{:.4f}".format(radius*math.sin(ang)) +" "+str(zloc)+"\" >\n")
             string1.append(tabs+"\t\t<geom mass=\"1.0\" rgba=\"0 0 1 1\" size=\""+"{:.3f}".format(sub_radius) +" "+ " " + "{:.4f}".format(half_width) +"\" type=\"cylinder\"/>\n")
-            string1.append(tabs+"\t\t<joint axis=\"0 0 1\" name=\"wheel"+str(i)+str(j+1)+"\" type=\"hinge\"/>\n")
+            if fix_plan==0:
+                string1.append(tabs+"\t\t<joint axis=\"0 0 1\" name=\"wheel"+str(i)+str(j+1)+"\" type=\"hinge\"/>\n")
             string1.append(tabs+"\t</body>\n")
         string1.append(tabs+"</body>\n")
     string1.append("\t\t</body>\n")         
@@ -132,7 +136,7 @@ def tire_gen_hinge(radius,wheelbase,payloadx,payloadz,payload_weight):
     
     ## Specify the motor names and numbers ##
     for i in range(4):
-        string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+'\" name=\"motor'+str(i)+'\"/>\n')
+        string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+'\" name=\"wheel'+str(i)+'\"/>\n')
 
     ## Finish setting up Mujoco inputs ##-0.15
     string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"-0.15 0 1.0\" quat=\"1.0 0.0 0 0\">\n')
@@ -199,9 +203,9 @@ def dolly_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_we
     for i in range(2):
         if fix_plan==0:
             for j in range(wheel_num+1):
-                string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+str(j)+'\" name=\"motor'+str(i)+str(j)+'\"/>\n')
+                string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+str(j)+'\" name=\"wheel'+str(i)+str(j)+'\"/>\n')
         else:
-            string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+str(0)+'\" name=\"motor'+str(i)+str(0)+'\"/>\n')
+            string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+str(0)+'\" name=\"wheel'+str(i)+str(0)+'\"/>\n')
 
     ## Finish setting up Mujoco inputs ##
     string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"-0.15 0 1.0\" quat=\"1.0 0.0 0 0\">\n')
