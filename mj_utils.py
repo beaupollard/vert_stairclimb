@@ -68,5 +68,5 @@ def get_power(sim):
         jtn_index=sim.model.get_joint_qvel_addr(sim.model._actuator_id2name[i])
         qvel=sim.data.qvel[jtn_index]
         act_f=sim.data.actuator_force[i]
-        power.append(act_f*qvel/(2*math.pi)*60./9.5488)
+        power.append(abs(act_f*qvel/(2*math.pi)*60./9.5488))
     return power

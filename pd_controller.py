@@ -41,14 +41,19 @@ class control():
 
     def velo(self,input_v,lim):
         kconst=1#(len(self.sim.model._actuator_id2name))/4-1
+        prev_contr=self.sim.data.ctrl+0.01
         kp=0.5
-        ki=0.00001
+        ki=0.0000
         for i in range(len(self.sim.model._actuator_id2name)):
             if self.sim.model._actuator_id2name[i][-1]=='0':
                 jtn_index=self.sim.model.get_joint_qvel_addr(self.sim.model._actuator_id2name[i])
-                feedback=1.0*abs(lim/(input_v/kconst))*(self.sim.data.qvel[jtn_index]-input_v/kconst)#+ki*self.sim.data.qacc[i+6]#(10*kp*(self.sim.data.qvel[i+6]-input_v/2)+0.*ki*self.integ[0][i])
+                feedback=abs(lim/(input_v/kconst))*(self.sim.data.qvel[jtn_index]-input_v/kconst)#+ki*self.sim.data.qacc[i+6]#(10*kp*(self.sim.data.qvel[i+6]-input_v/2)+0.*ki*self.integ[0][i])
                 # print(self.sim.model._actuator_id2name[i], self.sim.data.qvel[i+6], feedback)
                 self.integ[0][i]=self.integ[0][i]+feedback
+                if abs((feedback-prev_contr[i])/prev_contr[i])>0.1:
+                    feedback=(feedback-prev_contr[i])/2
+                if feedback<0:
+                    feedback=0
                 
                 
             else:
@@ -61,7 +66,7 @@ class control():
         self.integ_tot=np.append(self.integ_tot,self.integ,axis=0)
 
     def velowheel(self,input_v,lim,kei):
-
+        prev_contr=self.sim.data.ctrl+0.01
         ## Measure orientation ##
         if abs(2*self.sim.data.get_body_xquat('frame')[3])<=1.:
             skiderror = 180/math.pi*math.asin(2*self.sim.data.get_body_xquat('frame')[3])
@@ -71,11 +76,15 @@ class control():
             self.flag=True
             
         self.ke = kei*np.array([-skiderror,skiderror,-skiderror,skiderror,0])
-        kp=10.#0.65*lim/input_v#10.
-        ki=0.0075
+        kp=16.#0.65*lim/input_v#10.
+        ki=0.00
         for i in range(len(self.sim.model._actuator_id2name)):
             jtn_index=self.sim.model.get_joint_qvel_addr('wheel'+str(i))
-            feedback=self.ke[i]+(kp*(self.sim.data.qvel[jtn_index]-input_v)+ki*self.integ[0][i])
+            feedback=(self.ke[i]+(kp*(self.sim.data.qvel[jtn_index]-input_v)+ki*self.integ[0][i]))
+            if abs((feedback-prev_contr[i])/prev_contr[i])>0.1:
+                feedback=(feedback-prev_contr[i])/2
+            if feedback<0:
+                feedback=0
             self.integ[0][i]=feedback
             if abs(feedback)<lim:
                 self.sim.data.ctrl[i] = -feedback

@@ -17,7 +17,11 @@ def plotters(in1,in2):
     ax1.cla()
 
     ax.plot(in1[1:])
+    ax.set_xlabel("Time Step",fontsize=14)
+    ax.set_ylabel("Torque [Nm]",fontsize=14)
     ax1.plot(in2[1:])
+    ax1.set_xlabel("Time Step",fontsize=14)
+    ax1.set_ylabel("Power [W]",fontsize=14)
     # ax1.plot(wheelspeed[1:])
     # ax1.plot(wheelspeed0[1:])
     plt.show(block=False)
@@ -33,7 +37,7 @@ def apply_force(sim):
     for i,F in enumerate(Fout):
         sim.data.xfrc_applied[1,i] = F
 
-def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
+def main_run(viz,env_name,torque_lim,planet,winch,kei,track,divisor):
     _xml_path = env_name
     model  = load_model_from_path(_xml_path)
     sim = MjSim(model)
@@ -46,11 +50,12 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
         
 
     t = 0
-    init_time=300
+    init_time=100
     contr_tot=np.zeros((1,len(sim.model._actuator_id2name)))
     contr_pow=np.zeros((1,len(sim.model._actuator_id2name)))
     contr_max=np.zeros((1,len(sim.model._actuator_id2name)+6))
-    
+    cmpos=[]
+    cmvel=[]
     torque=[]
     wheelspeed=[]
     wheelspeed0=[]
@@ -61,7 +66,7 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
 
         if t>init_time: 
             if planet==1:
-                pd.velo(-6.28/1.5,lim)
+                pd.velo(-6.28/divisor,lim)
                 if winch==1:
                     apply_force(sim)                
             elif track==1:
@@ -69,7 +74,7 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
                 if winch==1:
                     apply_force(sim)
             else:
-                pd.velowheel(-6.28,lim,kei)
+                pd.velowheel(-6.28/divisor,lim,kei)
                 if winch==1:
                     apply_force(sim)
         
@@ -90,6 +95,8 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
         # # torque.append(180/math.pi*math.asin(sim.data.get_body_xquat('frame')[3]))
         # wheelspeed.append(sim.data.body_xpos[3])
         torque.append(sim.data.actuator_force[0])
+        cmpos=np.append(cmpos,sim.data.qpos[:3])
+        cmvel=np.append(cmvel,sim.data.qvel[:3])
         # wheelspeed.append(sim.data.actuator_force[-1])
         # torque.append(sim.data.qpos[sim.model.get_joint_qpos_addr('body_connect')]*180/math.pi)
         
@@ -97,9 +104,10 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
         # wheelspeed.append(sim.data.get_site_xpos('winch')[0]/np.linalg.norm(np.array(sim.data.get_site_xpos('winch'))))        
         if viz==True:
             viewer.render()
-            # plotters(torque,wheelspeed)
+            # print(sim.data.actuator_force[-1])
+            # plotters(torque,contr_pow)
             
-        if sim.data.qpos[0]>=sim.data.get_site_xpos('wypt0')[0]-1.0:
+        if sim.data.qpos[0]>=sim.data.get_site_xpos('wypt0')[0]-1.5:
             contr_max[0,0]=sim.data.time-init_time*sim.model.opt.timestep
             contr_max[0,1]=10/(sim.data.time-init_time*sim.model.opt.timestep)*60
             contr_max[0,2]=sim.data.qM[0]
@@ -115,14 +123,14 @@ def main_run(viz,env_name,torque_lim,planet,winch,kei,track):
             contr_max[0,5]=pow_sum#max(pow_sum)
             for i in range(len(sim.model._actuator_id2name)):
                 contr_max[0,i+6]=np.amax(np.abs(contr_tot[:,i]))
-            return True, contr_max
+            return True, contr_max, cmpos, cmvel, contr_pow, contr_tot
             run=False
         else:
             contr_tot=np.append(contr_tot,np.reshape(sim.data.actuator_force,(1,len(sim.model._actuator_id2name))),axis=0)
             contr_pow=np.append(contr_pow,np.array([get_power(sim)]),axis=0)
         
 
-        if sim.data.time>25+init_time*0.0025:
-            return False, contr_max
+        if sim.data.time>11+init_time*sim.model.opt.timestep:
+            return False, contr_max, cmpos, cmvel, contr_pow, contr_tot
         elif abs(180/math.pi*math.asin(sim.data.get_body_xquat('frame')[2]))>45.:
-            return False, contr_max
+            return False, contr_max, cmpos, cmvel, contr_pow, contr_tot

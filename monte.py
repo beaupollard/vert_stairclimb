@@ -13,6 +13,7 @@ def monte_sim_wheel(sim_dict,file_name):
 
     payloadx=get_gauss_rand(sim_dict["payload_xloc_mean"],sim_dict["payload_xloc_std"],sim_dict["payload_xloc_llim"],sim_dict["payload_xloc_ulim"])
     payloadz=get_gauss_rand(sim_dict["payload_zloc_mean"],sim_dict["payload_zloc_std"],sim_dict["payload_zloc_llim"],sim_dict["payload_zloc_ulim"])
+    friction=get_gauss_rand(sim_dict["friction_mean"],sim_dict["friction_std"],sim_dict["friction_llim"],sim_dict["friction_ulim"])
     count=1
     wheelbase=0
     radius=1
@@ -30,11 +31,11 @@ def monte_sim_wheel(sim_dict,file_name):
     elif sim_dict["track"]==1:
         string1=build_track_fixed(radius,wheelbase,payloadx,payloadz,payload_weight)
     else:
-        string1=tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["front2rear_ratio"])
+        string1=tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["front2rear_ratio"],friction)
     lines=string1
 
     ## Change step Geom ##
-    string1 = gen_steps(step_num,step_rise,step_slope,sim_dict["friction"])
+    string1 = gen_steps(step_num,step_rise,step_slope,friction)
     lines.append(string1)
 
 
@@ -55,6 +56,7 @@ def monte_sim_planet(sim_dict,file_name):
     payloadx=get_gauss_rand(sim_dict["payload_xloc_mean"],sim_dict["payload_xloc_std"],sim_dict["payload_xloc_llim"],sim_dict["payload_xloc_ulim"])
     payloadz=get_gauss_rand(sim_dict["payload_zloc_mean"],sim_dict["payload_zloc_std"],sim_dict["payload_zloc_llim"],sim_dict["payload_zloc_ulim"])
     wheel_num=int(get_gauss_rand(sim_dict["wheel_num_mean"],sim_dict["wheel_num_std"],sim_dict["wheel_num_llim"],sim_dict["wheel_num_ulim"]))
+    friction=get_gauss_rand(sim_dict["friction_mean"],sim_dict["friction_std"],sim_dict["friction_llim"],sim_dict["friction_ulim"])
     count=1
     wheelbase=0
     sub_radius=0
@@ -68,10 +70,10 @@ def monte_sim_planet(sim_dict,file_name):
             print("Wheelbase error")
             return
 
-    lines=planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["fix_plans"],sim_dict["friction"])
+    lines=planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["fix_plans"],friction,sim_dict["planet_tread"])
 
     ## Change step Geom ##
-    string1 = gen_steps(step_num,step_rise,step_slope,sim_dict["friction"])
+    string1 = gen_steps(step_num,step_rise,step_slope,friction)
     lines.append(string1)
 
     file_name=file_name

@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear):
+def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear,friction):
 
     half_width = 0.0125         # meters
     tread_height = 0.03175/2    # meters
@@ -9,9 +9,9 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear):
     names = ['rf_','lf_','rb_','lb_']
 
     mass = 2
-    num_treads=12
+    num_treads=int(2*math.pi*radius/tread_width/4/1.25)
     _, wheelbase = Get_track_parms(tread_height,radius,num_treads,wheelbase)
-    wheel_pos = np.array([[wheelbase,-0.4,-0.19],[wheelbase,0.4,-0.19],[-wheelbase,-0.4,-0.19],[-wheelbase,0.4,-0.19]])
+    wheel_pos = np.array([[wheelbase,-0.4,-0.23],[wheelbase,0.4,-0.23],[-wheelbase,-0.4,-0.23],[-wheelbase,0.4,-0.23]])
 
     theta = np.linspace(0,(360-360/num_treads)*math.pi/180,num_treads)+(0.9*180/num_treads*math.pi/180)
     tabs="\t\t\t"
@@ -35,7 +35,7 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear):
         string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+'\" name=\"wheel'+str(i)+'\"/>\n')
 
     ## Finish setting up Mujoco inputs ##-0.15
-    string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"0.0 0 0.0\" quat=\"1.0 0.0 0 0\">\n')
+    string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"0.15 0 1.0\" quat=\"1.0 0.0 0 0\">\n')
     string1.append(tabs+'<geom mass=\"0.005\" pos=\"0 0 0\" rgba=\"1 0 0 1.0\" size=\"0.5 0.3 0.1651\" type=\"box\"></geom>\n\t\t\t<joint type=\'free\' name=\'frame:base\' pos=\'0 0 0\'/>\n')
     string1.append(tabs+'<body name=\"mass0\" pos=\"'+str(payloadx)+' 0.0000 '+ str(payloadz)+'\" >\n\t\t\t\t<geom mass=\"'+str(payload_weight)+'\" rgba=\"0 1 1 1\" size=\"0.025\" type=\"sphere\"/>\n\t\t\t</body>\n')
     string1.append(tabs+'<site name="winch" pos="0.5 0 0.0" size="0.1 0.1 0.1" rgba="0 1 0 0" type="sphere"/>\n')
@@ -50,25 +50,26 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear):
             radius = radius_in
 
         string1.append(tabs+"<body name=\""+name+"wheel\" pos=\""+str(wheel_pos[i,0])+" "+str(wheel_pos[i,1])+" "+str(wheel_pos[i,2])+"\" quat=\"0.7071067811865476 0.7071067811865476 0 0\"> \n")
-        string1.append(tabs+"\t<geom mass=\""+str(mass)+"\" rgba=\"0 0 1 1.0\" size=\""+str(radius) +" " + str(half_width)+"\" type=\"cylinder\"/>\n")
+        string1.append(tabs+"\t<geom mass=\""+str(mass)+"\" rgba=\"0 0 1 1.0\" size=\""+str(radius) +" " + str(half_width)+"\" friction=\""+str(friction)+" 0.005 0.0001\" type=\"cylinder\"/>\n")
         string1.append(tabs+"\t<joint axis=\"0 0 1\" name=\"wheel"+str(i)+"\" type=\"hinge\"/>\n")
         string1.append(tabs+"\t<site name=\"wheel"+str(i)+"_t\" pos=\"0 0 0.0\" size='0.00005 0.00005 0.00005' rgba='0 1 0 1' type='sphere'/>\n")
         for j,ang in enumerate(theta):
             quat = ["{:.6f}".format(math.cos(ang/2)),"0.0","0.0","{:.6f}".format(math.sin(ang/2))]
 
             string1.append(tabs+"\t<body name=\""+name+"tread"+str(j)+"\" pos=\""+"{:.4f}".format((tread_height+radius)*math.cos(ang))+ " " + "{:.4f}".format((tread_height+radius)*math.sin(ang)) +" 0.0\" quat=\"" +quat[0]+" "+quat[1]+" "+quat[2]+" "+quat[3]+"\">\n")
-            string1.append(tabs+"\t\t<geom mass=\"0.022\" rgba=\"0 0 1 1.0\" size=\""+"{:.3f}".format(tread_height) +" "+ "{:.3f}".format(tread_width) + " " + "{:.4f}".format(half_width) +"\" type=\"box\"/>\n")
+            string1.append(tabs+"\t\t<geom mass=\"0.022\" rgba=\"0 0 1 1.0\" size=\""+"{:.3f}".format(tread_height) +" "+ "{:.3f}".format(tread_width) + " " + "{:.4f}".format(half_width) +"\" friction=\""+str(friction)+" 0.005 0.0001\" type=\"box\"/>\n")
             string1.append(tabs+"\t</body>\n")
         string1.append(tabs+"</body>\n")
     string1.append("\t\t</body>\n")
 
     return string1
 
-def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight,fix_plan,friction):
-
+def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payload_weight,fix_plan,friction,planet_tread):
+    prad=0.05
+    num_treads=wheel_num*2
     names = ['rf_','lf_','rb_','lb_']
     half_width = 0.0125   
-    wheel_pos = np.array([[wheelbase,-0.4,-0.19],[wheelbase,0.4,-0.19],[-wheelbase,-0.4,-0.19],[-wheelbase,0.4,-0.19]])
+    wheel_pos = np.array([[wheelbase,-0.4,-0.23],[wheelbase,0.4,-0.23],[-wheelbase,-0.4,-0.23],[-wheelbase,0.4,-0.23]])
     # wheel_pos = np.array([[wheelbase,-0.4,-0.19],[wheelbase,0.4,-0.19],[-wheelbase,-0.4,-0.19],[-wheelbase,0.4,-0.19]])
     mass = 1
     theta = np.linspace(0,(360-360/wheel_num)*math.pi/180,wheel_num)
@@ -89,7 +90,7 @@ def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payloa
             string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+str(0)+'\" name=\"wheel'+str(i)+str(0)+'\"/>\n')
 
     ## Finish setting up Mujoco inputs ##
-    string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"-0.15 0 1.0\" quat=\"1.0 0.0 0 0\">\n')
+    string1.append('\t</actuator>\n\n\t<worldbody>\n\t\t<body name=\"frame\" pos=\"0.1 0 1.0\" quat=\"1.0 0.0 0 0\">\n')
     string1.append(tabs+'<geom mass=\"0.005\" pos=\"0 0 0\" rgba=\"1 0 0 1\" size=\"0.5 0.3 0.1651\" type=\"box\"></geom>\n\t\t\t<joint type=\'free\' name=\'frame:base\' pos=\'0 0 0\'/>\n')
     string1.append(tabs+'<body name=\"mass0\" pos=\"'+str(payloadx)+' 0.0000 '+ str(payloadz)+'\" >\n\t\t\t\t<geom mass=\"'+str(payload_weight)+'\" rgba=\"0 0 1 1\" size=\"0.009 0.005 0.0125\" type=\"box\"/>\n\t\t\t</body>\n')
     string1.append(tabs+'<site name="winch" pos="0.5 0 0.0" size="0.1 0.1 0.1" rgba="0 1 0 0" type="sphere"/>\n')
@@ -97,7 +98,11 @@ def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payloa
     ## Create the wheel ##
     for i,name in enumerate(names):
         string1.append(tabs+"<body name=\""+name+"wheel\" pos=\""+str(wheel_pos[i,0])+" "+str(wheel_pos[i,1])+" "+str(wheel_pos[i,2])+"\" quat=\"0.7071067811865476 0.7071067811865476 0 0\"> \n")
-        string1.append(tabs+"\t<geom mass=\""+str(mass)+"\" rgba=\"0 0 1 1\" size=\""+str(0.05) +" " + str(half_width)+"\" type=\"cylinder\"/>\n")
+        string1.append(tabs+"\t<geom mass=\""+str(mass)+"\" rgba=\"0 0 1 1\" size=\""+str(prad) +" " + str(half_width)+"\" type=\"cylinder\"/>\n")
+
+        if planet_tread==1:
+            string2=set_treads(tabs,num_treads,name,prad,friction)
+            string1.append(string2)
         string1.append(tabs+"\t<joint axis=\"0 0 1\" name=\"wheel"+str(i)+"0\" type=\"hinge\"/>\n")
         if (i% 2) == 0:
             zloc=0.03
@@ -106,13 +111,27 @@ def planetary_gen(sub_radius,wheel_num,radius,wheelbase,payloadx,payloadz,payloa
         for j,ang in enumerate(theta):
 
             string1.append(tabs+"\t<body name=\""+name+"subwheel"+str(j)+"\" pos=\""+"{:.4f}".format(radius*math.cos(ang))+ " " + "{:.4f}".format(radius*math.sin(ang)) +" "+str(zloc)+"\" >\n")
-            string1.append(tabs+"\t\t<geom mass=\"1.0\" rgba=\"0 0 1 1\" size=\""+"{:.3f}".format(sub_radius) +" "+ " " + "{:.4f}".format(half_width) +"\" type=\"cylinder\"/>\n")
+            string1.append(tabs+"\t\t<geom mass=\"1.0\" rgba=\"0 0 1 1\" size=\""+"{:.3f}".format(sub_radius) +" "+ " " + "{:.4f}".format(half_width) +"\" friction=\""+str(friction)+" 0.005 0.0001\" type=\"cylinder\"/>\n")
             if fix_plan==0:
                 string1.append(tabs+"\t\t<joint axis=\"0 0 1\" name=\"wheel"+str(i)+str(j+1)+"\" type=\"hinge\"/>\n")
             string1.append(tabs+"\t</body>\n")
         string1.append(tabs+"</body>\n")
     string1.append("\t\t</body>\n")         
 
+    return string1
+
+def set_treads(tabs,num_treads,name,radius,friction):
+    half_width = 0.0125         # meters
+    tread_height = 0.03175/2    # meters
+    tread_width = 0.02508/2      # meters
+    theta = np.linspace(0,(360-360/num_treads)*math.pi/180,num_treads)-30*math.pi/180#(0.9*180/num_treads*math.pi/180)
+    string1=[]
+    for j,ang in enumerate(theta):
+        quat = ["{:.6f}".format(math.cos(ang/2)),"0.0","0.0","{:.6f}".format(math.sin(ang/2))]
+
+        string1.append(tabs+"\t<body name=\""+name+"tread"+str(j)+"\" pos=\""+"{:.4f}".format((tread_height+radius)*math.cos(ang))+ " " + "{:.4f}".format((tread_height+radius)*math.sin(ang)) +" 0.0\" quat=\"" +quat[0]+" "+quat[1]+" "+quat[2]+" "+quat[3]+"\">\n")
+        string1.append(tabs+"\t\t<geom mass=\"0.0002\" rgba=\"0 0 1 1.0\" size=\""+"{:.3f}".format(tread_height) +" "+ "{:.3f}".format(tread_width) + " " + "{:.4f}".format(half_width) +"\" friction=\""+str(friction)+" 0.005 0.0001\" type=\"box\"/>\n")
+        string1.append(tabs+"\t</body>\n")
     return string1
 
 def tire_gen_hinge(radius,wheelbase,payloadx,payloadz,payload_weight):

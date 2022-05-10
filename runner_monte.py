@@ -10,18 +10,18 @@ sim_dict = {
     "wheelbase_llim" : 0.3,
     "wheelbase_ulim" :  0.6,
 
-    "payload_xloc_mean" : 0.25,
-    "payload_xloc_std" :  0.2,
-    "payload_xloc_llim" :  0.05,
+    "payload_xloc_mean" : 0.05,#0.25,
+    "payload_xloc_std" :  0.3,#0.2,
+    "payload_xloc_llim" :  -0.2,
     "payload_xloc_ulim" :  0.4,
 
-    "payload_zloc_mean" : -0.1,
-    "payload_zloc_std" :  0.1, 
+    "payload_zloc_mean" : 0.0,#-0.1,
+    "payload_zloc_std" :  0.3,#0.1, 
     "payload_zloc_llim" :  -0.2,
     "payload_zloc_ulim" :  0.1,  
 
-    "wheel_size_mean" : 0.2286,
-    "wheel_size_std" : 0.0,
+    "wheel_size_mean" : 0.16,#0.1778,
+    "wheel_size_std" : 0.15,#0.05,
     "wheel_size_llim" : 0.15,
     "wheel_size_ulim" : 0.305,
 
@@ -31,7 +31,7 @@ sim_dict = {
     "sub_wheel_size_ulim" : 0.15,
 
     "wheel_num_mean" : 3,
-    "wheel_num_std" : 1,
+    "wheel_num_std" : 0,
     "wheel_num_llim" : 3,
     "wheel_num_ulim" : 6, 
 
@@ -40,12 +40,12 @@ sim_dict = {
     "step_num_llim" : 1,
     "step_num_ulim" : 1000,
 
-    "step_rise_mean" : 0.174,
+    "step_rise_mean" : 0.1778,
     "step_rise_std" : 0.0,#0.0254,
     "step_rise_llim" : 0.1524,
     "step_rise_ulim" : 0.2413,
 
-    "step_slope_mean" : 38,
+    "step_slope_mean" : 35,
     "step_slope_std" : 0,
     "step_slope_llim" : 28,
     "step_slope_ulim" : 45,  
@@ -55,27 +55,38 @@ sim_dict = {
     "payload_llim" : 0,
     "payload_ulim" : 455,    
 
+    "friction_mean" : 1.0,
+    "friction_std" : 0,
+    "friction_llim" : 0,
+    "friction_ulim" : 1.1,  
+
     "front2rear_ratio" : 1.0 ,
 
     "hinge" : 0,
-    "planet": 0,
+    "planet": 1,
     "dolly" : 0,
     "stable_len" : 0.35,
     "fix_plans" : 1,
-    "friction" : 0.62,
     "track" : 0,
+    "planet_tread" : 0,
 
     "winch" : 0,
-    "winch_force": 100
+    "winch_force": 100,
+
+    "seed": 0
 }
 
 def run_multi(ii):
-    path = 'Wheel_Monte/V1'
+    if sim_dict["planet"]==0:
+        path = 'Wheel_CDR35'
+    else:
+        path = 'Planet_CDR35'
     filenamelist=['payxlocVzloc_pay0.csv','payxlocVzloc_pay20.csv','payxlocVzloc_pay40.csv','payxlocVzloc_pay60.csv']
     vmass=[50,70,90,110]
-    # sim_dict["step_slope_mean"] = 38.
+    np.random.seed(ii+12)
     sim_dict["payload_mean"] = vmass[ii]
     writeout=1
+    output_com=False
     # weight_in=np.linspace(0.1,-0.2,10)
     # radius_in=np.linspace(0.05,0.3,10)
     count2=0
@@ -99,22 +110,27 @@ def run_multi(ii):
         count = 0
         contr_max_out=np.zeros((1,1))
         kei=1.2
+        divisor=1.
         while moveon==False:
-            success_flag, contr_max = main_run(viz=False,env_name=env_name,torque_lim=torque_lim,planet=sim_dict["planet"],winch=sim_dict["winch"],kei=kei,track=sim_dict["track"])
+            success_flag, contr_max, cmpos, cmvel, powtot, tortot  = main_run(viz=False,env_name=env_name,torque_lim=torque_lim,planet=sim_dict["planet"],winch=sim_dict["winch"],kei=kei,track=sim_dict["track"],divisor=divisor)
             
             if success_flag==False and count==0:
-                
+                divisor=1.1
                 if sim_dict["planet"]==1:
                     torque_lim=btorque_lim
                 else:
                     kei=0.9
-            if count>8:
+            if count>6:
                 moveon=True
 
             if success_flag==True:
                 utorque_lim=torque_lim
                 torque_lim=(torque_lim+btorque_lim)/2
                 contr_max_out = contr_max
+                cmpos_out=np.reshape(cmpos,(-1,3))
+                cmvel_out=np.reshape(cmvel,(-1,3))
+                power_out=powtot
+                torque_out=tortot               
                 if abs(torque_lim-(torque_lim+btorque_lim)/2)<1.0:
                     moveon=True
             else:
@@ -129,10 +145,12 @@ def run_multi(ii):
             outp=np.append([0],np.append(inpts,np.reshape(contr_max_out,(len(contr_max_out[0]),))))
 
         outp=np.reshape(outp,(1,len(outp)))
-        
+        if output_com==True:
+            np.savetxt(path+filenamelist[ii][:-4]+"cmpos"+str(count2)+".csv", cmpos_out, delimiter=",")
+            np.savetxt(path+filenamelist[ii][:-4]+"cmvel"+str(count2)+".csv", cmvel_out, delimiter=",")     
         ## Setup .csv file ##
         if writeout==1:
-            if count2==0:
+            if count2==-10:
                 with open(outfilename,'w') as csvfile:
                     np.savetxt(csvfile,outp,delimiter=' ',header='Success wheel_radius wheelbase payload_xloc payload_zloc time steps/min cg_xloc max_power W0_torque W1_torque W2_torque W3_torque')
             else:
