@@ -5,8 +5,8 @@ from mj_utils import replace_output
 from multiprocessing import Process
 
 sim_dict = {
-    "wheelbase_mean" : 0.46,
-    "wheelbase_std" :  0.0,
+   "wheelbase_mean" : 0.46,
+    "wheelbase_std" :  0.1,
     "wheelbase_llim" : 0.3,
     "wheelbase_ulim" :  0.6,
 
@@ -20,7 +20,7 @@ sim_dict = {
     "payload_zloc_llim" :  -0.2,
     "payload_zloc_ulim" :  0.1,  
 
-    "wheel_size_mean" : 0.16,#0.1778,
+    "wheel_size_mean" : 0.175,#0.1778,
     "wheel_size_std" : 0.15,#0.05,
     "wheel_size_llim" : 0.15,
     "wheel_size_ulim" : 0.305,
@@ -45,7 +45,7 @@ sim_dict = {
     "step_rise_llim" : 0.1524,
     "step_rise_ulim" : 0.2413,
 
-    "step_slope_mean" : 35,
+    "step_slope_mean" : 31,
     "step_slope_std" : 0,
     "step_slope_llim" : 28,
     "step_slope_ulim" : 45,  
@@ -55,10 +55,10 @@ sim_dict = {
     "payload_llim" : 0,
     "payload_ulim" : 455,    
 
-    "friction_mean" : 1.0,
-    "friction_std" : 0,
-    "friction_llim" : 0,
-    "friction_ulim" : 1.1,  
+    "friction_mean" : 0.55,
+    "friction_std" : 0.45,
+    "friction_llim" : 0.1,
+    "friction_ulim" : 1.0,  
 
     "front2rear_ratio" : 1.0 ,
 
@@ -78,12 +78,12 @@ sim_dict = {
 
 def run_multi(ii):
     if sim_dict["planet"]==0:
-        path = 'Wheel_CDR35'
+        path = 'Wheel_CDR_Rand'
     else:
-        path = 'Planet_CDR35'
+        path = 'Planet_CDR_Rand'
     filenamelist=['payxlocVzloc_pay0.csv','payxlocVzloc_pay20.csv','payxlocVzloc_pay40.csv','payxlocVzloc_pay60.csv']
     vmass=[50,70,90,110]
-    np.random.seed(ii+12)
+    np.random.seed(ii+34)
     sim_dict["payload_mean"] = vmass[ii]
     writeout=1
     output_com=False
@@ -150,7 +150,7 @@ def run_multi(ii):
             np.savetxt(path+filenamelist[ii][:-4]+"cmvel"+str(count2)+".csv", cmvel_out, delimiter=",")     
         ## Setup .csv file ##
         if writeout==1:
-            if count2==-10:
+            if count2==0:
                 with open(outfilename,'w') as csvfile:
                     np.savetxt(csvfile,outp,delimiter=' ',header='Success wheel_radius wheelbase payload_xloc payload_zloc time steps/min cg_xloc max_power W0_torque W1_torque W2_torque W3_torque')
             else:

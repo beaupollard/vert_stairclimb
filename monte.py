@@ -45,7 +45,7 @@ def monte_sim_wheel(sim_dict,file_name):
         f.writelines(i)
     f.close()
 
-    return np.array([radius,wheelbase,payloadx,payloadz, step_rise, step_slope,payload_weight])
+    return np.array([0,0,radius,wheelbase,payloadx,payloadz, step_rise, step_slope,payload_weight,friction])
 
 def monte_sim_planet(sim_dict,file_name):
     payload_weight = get_gauss_rand(sim_dict["payload_mean"],sim_dict["payload_std"],sim_dict["payload_llim"],sim_dict["payload_ulim"])
@@ -82,7 +82,7 @@ def monte_sim_planet(sim_dict,file_name):
         f.writelines(i)
     f.close()
 
-    return np.array([ sub_radius, wheel_num, radius, wheelbase, payloadx, payloadz, step_rise, step_slope,payload_weight])
+    return np.array([ sub_radius, wheel_num, radius, wheelbase, payloadx, payloadz, step_rise, step_slope,payload_weight,friction])
 
 def monte_sim_planet_dolly(sim_dict,file_name):
     payload_weight = get_gauss_rand(sim_dict["payload_mean"],sim_dict["payload_std"],sim_dict["payload_llim"],sim_dict["payload_ulim"])
@@ -93,6 +93,7 @@ def monte_sim_planet_dolly(sim_dict,file_name):
     payloadx=get_gauss_rand(sim_dict["payload_xloc_mean"],sim_dict["payload_xloc_std"],sim_dict["payload_xloc_llim"],sim_dict["payload_xloc_ulim"])
     payloadz=get_gauss_rand(sim_dict["payload_zloc_mean"],sim_dict["payload_zloc_std"],sim_dict["payload_zloc_llim"],sim_dict["payload_zloc_ulim"])
     wheel_num=int(get_gauss_rand(sim_dict["wheel_num_mean"],sim_dict["wheel_num_std"],sim_dict["wheel_num_llim"],sim_dict["wheel_num_ulim"]))
+    friction=get_gauss_rand(sim_dict["friction_mean"],sim_dict["friction_std"],sim_dict["friction_llim"],sim_dict["friction_ulim"])
     count=1
     wheelbase=0
     sub_radius=0
@@ -118,7 +119,7 @@ def monte_sim_planet_dolly(sim_dict,file_name):
         f.writelines(i)
     f.close()
 
-    return np.array([ sub_radius, wheel_num, radius, wheelbase, payloadx, payloadz, step_rise, step_slope,payload_weight])
+    return np.array([ sub_radius, wheel_num, radius, wheelbase, payloadx, payloadz, step_rise, step_slope,payload_weight,friction])
 
 def ID_Stairs(lines):
     for i, stg in enumerate(lines):
