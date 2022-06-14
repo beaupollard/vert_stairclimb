@@ -1,5 +1,6 @@
 # from matplotlib.lines import _LineStyle
 from math import ceil
+from matplotlib.axis import XAxis
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
@@ -139,9 +140,15 @@ def Load_Data(path,filenamelist,pay_ind,rows):
             with open(filename, 'r') as file:
                 csvreader = csv.reader(file)
                 header = next(csvreader)
+                coun=0
                 for row in csvreader:
+                    # print(coun)
+                    # coun=coun+1
                     inp=(row[0][:].split(' '))
                     inp = ([float(x) for x in inp])
+                    if inp[1]==0:
+                        inp[10:11]=[]
+                        inp[1:3]=[]
                     payw=inp[pay_ind]
                     if inp[0]==1:
                         leninp=len(inp)
@@ -377,13 +384,20 @@ def Plot_Scatters_Bins_Rad(data,xind,yind,disc,bin,radind,c):
         plt.ylabel(disc[yind-1])
         plt.title(binrange[jj])
 
-def Plot_Heat(data,xind,yind,disc,bin):
+def Plot_Heat(data,xind,yind,disc,bin,nameo):
+      
     MS=10.
     binrange=np.linspace(min(data[:,bin])-0.01,max(data[:,bin])+0.01,5)
     for jj in range(1,len(binrange)):
         plt.figure(jj)
-        x = np.linspace(min(data[:,xind])-0.0001, max(data[:,xind])+0.0001, 10)
-        y = np.linspace(min(data[:,yind])-0.0001, max(data[:,yind])+0.0001, 10)
+        
+        # x = np.linspace(min(data[:,xind])-0.0001, max(data[:,xind])+0.0001, 10)
+        # y = np.linspace(min(data[:,yind])-0.0001, max(data[:,yind])+0.0001, 10)
+        fpts=3
+        x = np.concatenate((np.linspace(min(data[:,xind])-0.0001, max(data[:,xind])-3, 14),np.linspace(max(data[:,xind])-3+3/(fpts-1),max(data[:,xind])+0.001, fpts)))
+        y = np.concatenate((np.linspace(min(data[:,yind])-0.0001, max(data[:,yind])-3, 14),np.linspace(max(data[:,yind])-3+3/(fpts-1),max(data[:,yind])+0.001, fpts)))
+        # x.append(x,np.linspace(max(data[:,xind])-3,max(data[:,xind])+0.001, 10))
+        # y.append(y,np.linspace(max(data[:,yind])-3,max(data[:,yind])+0.001, 10))
         # full coorindate arrays
         xx, yy = np.meshgrid(x, y)
         zzp = np.zeros(np.shape(xx))
@@ -413,6 +427,21 @@ def Plot_Heat(data,xind,yind,disc,bin):
                 failp.append(ii)
 
         zz=zzp/(zzp+zzf)
+        for ii in range(len(zz[:,0])):
+            for hh in range(len(zz[0,:])):
+                if np.isnan(zz[ii,hh])==True:
+                    zz[ii,hh]=0
+                    count=0
+                    for ki in range(3):
+                        for kj in range(3):
+                            if ii+ki<len(zz[0,:]) and hh+kj<len(zz[:,0]):
+                                if np.isnan(zz[ii+ki,hh+kj])==False:
+                                    zz[ii,hh]=zz[ii,hh]+zz[ii+ki,hh+kj]
+                                    count=count+1
+                    if count>0:
+                        zz[ii,hh]=zz[ii,hh]/count
+
+                    
         cs = plt.contourf(xx[0:-1,0:-1],yy[0:-1,0:-1],zz[0:-1,0:-1],levels=np.linspace(0,1,11))    
         # plt.plot(data[passp,xind],data[passp,yind],'.b')
         # plt.plot(data[failp,xind],data[failp,yind],'.r')   
@@ -421,10 +450,20 @@ def Plot_Heat(data,xind,yind,disc,bin):
         #     plt.plot([x[i],x[i]],[y[0],y[-1]],'k')
         #     plt.plot([x[0],x[-1]],[y[i],y[i]],'k')
         cbar = plt.colorbar(cs)
-        plt.xlabel(disc[xind-1])
-        plt.ylabel(disc[yind-1])
-        title="Wheel radius is between %s and %s inches" % (ceil(binrange[jj-1]), ceil(binrange[jj]))
+        # x = 
+        # y = [-8, -4, 0, 4]
+        # default_x_ticks = range(len(x))
+        # plt.yticks(default_x_ticks, y)
+        plt.yticks([-7.5, -4 , -0.5, 3.0], [-7.5, -4 , -0.5, 3])
+        plt.xticks([-7.5, 0, 7.5, 15.], [-7.5, 0, 7.5, 15])
+        plt.xlim([-7.5,15])
+        plt.ylim([-7.75,3.0])
+        plt.xlabel('CoM x pos [in]')#disc[xind-1])
+        plt.ylabel('CoM z pos [in]')#disc[yind-1])
+        # title="Wheel radius is between %s and %s inches" % (ceil(binrange[jj-1]), ceil(binrange[jj]))
+        title=" %s\" < r < %s\" " % (ceil(binrange[jj-1]), ceil(binrange[jj]))
         plt.title(title)
+        plt.savefig(nameo+str(ceil(binrange[jj-1]))+'.pdf',bbox_inches='tight',dpi=200)
 
 def Plot_Ave_Heat(data,xind,yind,disc,bin,data2):
     MS=10.
@@ -511,23 +550,33 @@ def Get_Mesh(xind,yind,jj,binrange,data,bin):
         zz=zzp/(zzp+zzf)    
         return xx, yy, zz
     ## split grid ##
+#plt.rcParams.keys() gives all inputs
+font = {'font.serif' : 'Times New Toman',
+        'font.size'   : 28}
+plt.rcParams.update(font)
 ## for wheeled ##
 # 1 : radius    2 : wheelbase   3 : payloadx  4 : payloadz   5 : step_rise    6 : step_slope    7 : payload_weight
 # 8 : sim time    9 : speed [steps/min]  10 : mass  11 : max power  12 : average power   13 : power sum  14-end : max torque 
 disc=['radius','wheelbase','payloadx','payloadz','step_rise','step_slope','payload_weight','sim_time','speed','mass','max power','average power','power sum','max torque']
 path = 'Wheel_CDR35'
+# filenamelist=['payxlocVzloc_pay60.csv']
 filenamelist=['payxlocVzloc_pay0.csv','payxlocVzloc_pay20.csv','payxlocVzloc_pay40.csv','payxlocVzloc_pay60.csv']
 data=Load_Data(path,filenamelist,7,[])
+for i in range(len(data[:,0])):
+    if data[i,2]==0:
+        data[i,1:]=data[i,3:-3]
+
 data[:,1:6]=data[:,1:6]*39.3701
 # path = 'Wheel_CDR35v2'
 # data2=Load_Data(path,filenamelist,7,[])
 # data2[:,1:6]=data2[:,1:6]*39.3701
 
+
 # Plot_Ave_Heat(data,3,4,disc,1,data2)
 # Plot_Scatters(data,3,[4,1],disc)
 # Plot_Scatters_Bins(data,3,4,disc,7)
 # Plot_Scatters_Bins(data,3,4,disc,7)
-Plot_Heat(data,3,4,disc,1)
+Plot_Heat(data,3,4,disc,1,path)
 plt.show()
 
 ## for planetary dolly ##
@@ -539,12 +588,12 @@ plt.show()
 # filenamelist=['payxlocVzloc_pay0.csv','payxlocVzloc_pay20.csv','payxlocVzloc_pay40.csv','payxlocVzloc_pay60.csv']
 # data=Load_Data(path,filenamelist,9,[])
 # data[:,3:9]=data[:,3:9]*39.3701
-# path = 'Planet_CDR41'
-# data2=Load_Data(path,filenamelist,9,[])
-# data2[:,3:9]=data2[:,3:9]*39.3701
+# # path = 'Planet_CDR35'
+# # data2=Load_Data(path,filenamelist,9,[])
+# # data2[:,3:9]=data2[:,3:9]*39.3701
 # # Plot_Scatters(data,5,[14,6],disc)
 # # Plot_Scatters_Bins(data,5,6,disc,3)
 # # Plot_Scatters_Bins_Rad(data,5,6,disc,9,3,9)
-# Plot_Heat(data,5,6,disc,3)
+# Plot_Heat(data,5,6,disc,3,path)
 # # Plot_Ave_Heat(data,5,6,disc,3,data2)
 # plt.show()

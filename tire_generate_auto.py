@@ -1,18 +1,41 @@
 import numpy as np
 import math
 
-def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear,friction):
+def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear,friction,num_wheels):
 
     half_width = 0.0125         # meters
     tread_height = 0.03175/2    # meters
     tread_width = 0.0508/2      # meters
-    names = ['rf_','lf_','rb_','lb_']
-
+    # names = ['rf_','lf_','rb_','lb_']
+    names=[]
     mass = 2
     num_treads=int(2*math.pi*radius/tread_width/4/1.25)
     _, wheelbase = Get_track_parms(tread_height,radius,num_treads,wheelbase)
-    wheel_pos = np.array([[wheelbase,-0.4,-0.23],[wheelbase,0.4,-0.23],[-wheelbase,-0.4,-0.23],[-wheelbase,0.4,-0.23]])
-
+    wheel_xpos = np.linspace(-wheelbase,wheelbase,int(num_wheels/2))
+    wheel_pos=[]
+    count=0
+    countn=0
+    for i,posx in enumerate(wheel_xpos):
+        if count==0:
+            if len(wheel_pos)==0:
+                wheel_pos=np.array([posx,-0.4,-0.23])
+                wheel_pos=np.concatenate((wheel_pos,np.array([posx,0.4,-0.23])))
+            else:
+                wheel_pos=np.concatenate((wheel_pos,np.array([posx,-0.4,-0.23])))
+                wheel_pos=np.concatenate((wheel_pos,np.array([posx,0.4,-0.23])))
+            names.append('r'+str(countn)+'_')
+            names.append('l'+str(countn)+'_')
+            count=1
+        else:
+            wheel_pos=np.concatenate((wheel_pos,np.array([posx,-0.35,-0.23])))
+            wheel_pos=np.concatenate((wheel_pos,np.array([posx,0.35,-0.23])))
+            names.append('r'+str(countn)+'_')
+            names.append('l'+str(countn)+'_')
+            count=0
+        countn=countn+1
+        
+        # wheel_pos = np.array([[wheelbase,-0.4,-0.23],[wheelbase,0.4,-0.23],[-wheelbase,-0.4,-0.23],[-wheelbase,0.4,-0.23]])
+    wheel_pos=wheel_pos.reshape((-1,3))
     theta = np.linspace(0,(360-360/num_treads)*math.pi/180,num_treads)+(0.9*180/num_treads*math.pi/180)
     tabs="\t\t\t"
     ## Setup the initial mujoco lines ##
@@ -31,7 +54,7 @@ def tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,front2rear,fricti
     string1.append('\t<actuator>\n')
     
     ## Specify the motor names and numbers ##
-    for i in range(4):
+    for i in range(num_wheels):
         string1.append('\t\t<motor gear=\"1.0\" joint=\"wheel'+str(i)+'\" name=\"wheel'+str(i)+'\"/>\n')
 
     ## Finish setting up Mujoco inputs ##-0.15

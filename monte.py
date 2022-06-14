@@ -31,7 +31,7 @@ def monte_sim_wheel(sim_dict,file_name):
     elif sim_dict["track"]==1:
         string1=build_track_fixed(radius,wheelbase,payloadx,payloadz,payload_weight)
     else:
-        string1=tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["front2rear_ratio"],friction)
+        string1=tire_gen(radius,wheelbase,payloadx,payloadz,payload_weight,sim_dict["front2rear_ratio"],friction,sim_dict["num_wheels"])
     lines=string1
 
     ## Change step Geom ##

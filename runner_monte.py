@@ -3,108 +3,109 @@ from monte import monte_sim_wheel, monte_sim_planet, monte_sim_planet_dolly
 import numpy as np
 from mj_utils import replace_output
 from multiprocessing import Process
+from wheeled_dict import sim_dict
 
-sim_dict = {
-   "wheelbase_mean" : 0.46,
-    "wheelbase_std" :  0.1,
-    "wheelbase_llim" : 0.3,
-    "wheelbase_ulim" :  0.6,
+# sim_dict = {
+#    "wheelbase_mean" : 0.46,
+#     "wheelbase_std" :  0.1,
+#     "wheelbase_llim" : 0.3,
+#     "wheelbase_ulim" :  0.6,
 
-    "payload_xloc_mean" : 0.05,#0.25,
-    "payload_xloc_std" :  0.3,#0.2,
-    "payload_xloc_llim" :  -0.2,
-    "payload_xloc_ulim" :  0.4,
+#     "payload_xloc_mean" : 3.719074741737698475e-01,#0.05,#0.25,
+#     "payload_xloc_std" :  0.0,#0.2,
+#     "payload_xloc_llim" :  -0.2,
+#     "payload_xloc_ulim" :  0.4,
 
-    "payload_zloc_mean" : 0.0,#-0.1,
-    "payload_zloc_std" :  0.3,#0.1, 
-    "payload_zloc_llim" :  -0.2,
-    "payload_zloc_ulim" :  0.1,  
+#     "payload_zloc_mean" : 0.0,#-0.1,
+#     "payload_zloc_std" :  0.3,#0.1, 
+#     "payload_zloc_llim" :  -0.2,
+#     "payload_zloc_ulim" :  0.1,  
 
-    "wheel_size_mean" : 0.175,#0.1778,
-    "wheel_size_std" : 0.15,#0.05,
-    "wheel_size_llim" : 0.15,
-    "wheel_size_ulim" : 0.305,
+#     "wheel_size_mean" : 2.896841286394191139e-01,#0.175,#0.1778,
+#     "wheel_size_std" : 0.15,#0.05,
+#     "wheel_size_llim" : 0.15,
+#     "wheel_size_ulim" : 0.305,
 
-    "sub_wheel_size_mean" : 0.05715,
-    "sub_wheel_size_std" : 0.00,
-    "sub_wheel_size_llim" : 0.01,
-    "sub_wheel_size_ulim" : 0.15,
+#     "sub_wheel_size_mean" : 0.05715,
+#     "sub_wheel_size_std" : 0.00,
+#     "sub_wheel_size_llim" : 0.01,
+#     "sub_wheel_size_ulim" : 0.15,
 
-    "wheel_num_mean" : 3,
-    "wheel_num_std" : 0,
-    "wheel_num_llim" : 3,
-    "wheel_num_ulim" : 6, 
+#     "wheel_num_mean" : 3,
+#     "wheel_num_std" : 0,
+#     "wheel_num_llim" : 3,
+#     "wheel_num_ulim" : 6, 
 
-    "step_num_mean" : 11,
-    "step_num_std" : 0,
-    "step_num_llim" : 1,
-    "step_num_ulim" : 1000,
+#     "step_num_mean" : 11,
+#     "step_num_std" : 0,
+#     "step_num_llim" : 1,
+#     "step_num_ulim" : 1000,
 
-    "step_rise_mean" : 0.1778,
-    "step_rise_std" : 0.0,#0.0254,
-    "step_rise_llim" : 0.1524,
-    "step_rise_ulim" : 0.2413,
+#     "step_rise_mean" : 0.1778,
+#     "step_rise_std" : 0.0,#0.0254,
+#     "step_rise_llim" : 0.1524,
+#     "step_rise_ulim" : 0.2413,
 
-    "step_slope_mean" : 31,
-    "step_slope_std" : 0,
-    "step_slope_llim" : 28,
-    "step_slope_ulim" : 45,  
+#     "step_slope_mean" : 31,
+#     "step_slope_std" : 0,
+#     "step_slope_llim" : 28,
+#     "step_slope_ulim" : 45,  
 
-    "payload_mean" : 60,
-    "payload_std" : 0,
-    "payload_llim" : 0,
-    "payload_ulim" : 455,    
+#     "payload_mean" : 60,
+#     "payload_std" : 0,
+#     "payload_llim" : 0,
+#     "payload_ulim" : 455,    
 
-    "friction_mean" : 0.55,
-    "friction_std" : 0.45,
-    "friction_llim" : 0.1,
-    "friction_ulim" : 1.0,  
+#     "friction_mean" : 0.55,
+#     "friction_std" : 0.45,
+#     "friction_llim" : 0.1,
+#     "friction_ulim" : 1.0,  
 
-    "front2rear_ratio" : 1.0 ,
+#     "front2rear_ratio" : 1.0 ,
 
-    "hinge" : 0,
-    "planet": 1,
-    "dolly" : 0,
-    "stable_len" : 0.35,
-    "fix_plans" : 1,
-    "track" : 0,
-    "planet_tread" : 0,
+#     "hinge" : 0,
+#     "planet": 1,
+#     "dolly" : 0,
+#     "stable_len" : 0.35,
+#     "fix_plans" : 1,
+#     "track" : 0,
+#     "planet_tread" : 0,
 
-    "winch" : 0,
-    "winch_force": 100,
+#     "winch" : 0,
+#     "winch_force": 100,
 
-    "seed": 0
-}
+#     "seed": 0
+# }
 
 def run_multi(ii):
     if sim_dict["planet"]==0:
-        path = 'Wheel_CDR_Rand'
+        path = 'Wheel_design0fn'
     else:
-        path = 'Planet_CDR_Rand'
+        path = 'Planet_design0fn'
     filenamelist=['payxlocVzloc_pay0.csv','payxlocVzloc_pay20.csv','payxlocVzloc_pay40.csv','payxlocVzloc_pay60.csv']
-    vmass=[50,70,90,110]
-    np.random.seed(ii+34)
+    vmass=[110,90,90,110]
+    np.random.seed(ii+20)
     sim_dict["payload_mean"] = vmass[ii]
     writeout=1
     output_com=False
     # weight_in=np.linspace(0.1,-0.2,10)
     # radius_in=np.linspace(0.05,0.3,10)
-    count2=0
+    count2=10
     outfilename=path+filenamelist[ii]
     filename_env=['envi0.xml','envi1.xml','envi2.xml','envi3.xml']
     while True:
 
-        if sim_dict["planet"]==0:
-            inpts=monte_sim_wheel(sim_dict,filename_env[ii])
-        elif sim_dict["dolly"]==1:
-            inpts=monte_sim_planet_dolly(sim_dict,filename_env[ii])
-        else:
-            inpts=monte_sim_planet(sim_dict,filename_env[ii])
+        # if sim_dict["planet"]==0:
+        #     inpts=monte_sim_wheel(sim_dict,filename_env[ii])
+        # elif sim_dict["dolly"]==1:
+        #     inpts=monte_sim_planet_dolly(sim_dict,filename_env[ii])
+        # else:
+        #     inpts=monte_sim_planet(sim_dict,filename_env[ii])
 
         count = 0
         moveon=False
         utorque_lim=200.
-        btorque_lim=40.
+        btorque_lim=80.
         torque_lim=utorque_lim
         env_name=filename_env[ii]#'envi.xml'
         count = 0
@@ -112,7 +113,7 @@ def run_multi(ii):
         kei=1.2
         divisor=1.
         while moveon==False:
-            success_flag, contr_max, cmpos, cmvel, powtot, tortot  = main_run(viz=False,env_name=env_name,torque_lim=torque_lim,planet=sim_dict["planet"],winch=sim_dict["winch"],kei=kei,track=sim_dict["track"],divisor=divisor)
+            success_flag, contr_max, cmpos, cmvel, powtot, tortot  = main_run(viz=True,env_name=env_name,torque_lim=torque_lim,planet=sim_dict["planet"],winch=sim_dict["winch"],kei=kei,track=sim_dict["track"],divisor=divisor)
             
             if success_flag==False and count==0:
                 divisor=1.1
@@ -120,7 +121,7 @@ def run_multi(ii):
                     torque_lim=btorque_lim
                 else:
                     kei=0.9
-            if count>6:
+            if count>1:
                 moveon=True
 
             if success_flag==True:
@@ -162,14 +163,14 @@ def run_multi(ii):
             
         count2=count2+1
         print(count2)
-
-processes = []
-for i in range(4):
-    p = Process(target=run_multi, args=(i,))
-    p.start()
-    processes.append(p)
-    # run_multi(i)
-for p in processes:
-    p.join()
-# run_multi(3)
-print('done')
+run_multi(0)
+# processes = []
+# for i in range(4):
+#     p = Process(target=run_multi, args=(i,))
+#     p.start()
+#     processes.append(p)
+#     # run_multi(i)
+# for p in processes:
+#     p.join()
+# # run_multi(3)
+# print('done')

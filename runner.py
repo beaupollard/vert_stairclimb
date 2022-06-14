@@ -3,78 +3,7 @@ from monte import monte_sim_wheel, monte_sim_planet, monte_sim_planet_dolly
 import numpy as np
 from mj_utils import replace_output
 from multiprocessing import Process
-
-sim_dict = {
-    "wheelbase_mean" : 0.46,
-    "wheelbase_std" :  0.0,
-    "wheelbase_llim" : 0.3,
-    "wheelbase_ulim" :  0.6,
-
-    "payload_xloc_mean" : 0.25,
-    "payload_xloc_std" :  0.0,
-    "payload_xloc_llim" :  -0.1,
-    "payload_xloc_ulim" :  0.4,
-
-    "payload_zloc_mean" : -0.1,
-    "payload_zloc_std" :  0.0, 
-    "payload_zloc_llim" :  -0.2,
-    "payload_zloc_ulim" :  0.1,  
-
-    "wheel_size_mean" : 0.1778,
-    "wheel_size_std" : 0.00,
-    "wheel_size_llim" : 0.15,
-    "wheel_size_ulim" : 0.305,
-
-    "sub_wheel_size_mean" : 0.05715,
-    "sub_wheel_size_std" : 0.00,
-    "sub_wheel_size_llim" : 0.01,
-    "sub_wheel_size_ulim" : 0.15,
-
-    "wheel_num_mean" : 3,
-    "wheel_num_std" : 0,
-    "wheel_num_llim" : 3,
-    "wheel_num_ulim" : 6, 
-
-    "step_num_mean" : 11,
-    "step_num_std" : 0,
-    "step_num_llim" : 1,
-    "step_num_ulim" : 1000,
-
-    "step_rise_mean" : 0.1778,
-    "step_rise_std" : 0.0,#0.0254,
-    "step_rise_llim" : 0.1524,
-    "step_rise_ulim" : 0.2413,
-
-    "step_slope_mean" : 35,
-    "step_slope_std" : 0,
-    "step_slope_llim" : 28,
-    "step_slope_ulim" : 45,  
-
-    "payload_mean" : 60,
-    "payload_std" : 0,
-    "payload_llim" : 0,
-    "payload_ulim" : 455,    
-
-    "friction_mean" : 1.0,
-    "friction_std" : 0,
-    "friction_llim" : 0,
-    "friction_ulim" : 1.1,  
-
-    "front2rear_ratio" : 1.0 ,
-
-    "hinge" : 0,
-    "planet": 0,
-    "dolly" : 0,
-    "stable_len" : 0.35,
-    "fix_plans" : 1,
-    "track" : 0,
-    "planet_tread" : 0,
-
-    "winch" : 0,
-    "winch_force": 100,
-
-    "seed": 0
-}
+from wheeled_dict import sim_dict
 
 def run_multi(ii):
     sim_dict["payload_xloc_mean"]=0.39764942
@@ -86,7 +15,7 @@ def run_multi(ii):
     else:
         path = 'Planet_CDR35'
     filenamelist=['payxlocVzloc_pay0.csv','payxlocVzloc_pay20.csv','payxlocVzloc_pay40.csv','payxlocVzloc_pay60.csv']
-    vmass=[50,70,90,110]
+    vmass=[110]#[50,70,90,110]
     np.random.seed(ii+1)
     
     writeout=0
